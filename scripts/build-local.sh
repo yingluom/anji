@@ -16,6 +16,9 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="$ROOT_DIR/build"
 LOG_FILE="$BUILD_DIR/build.log"
 
+# Ensure all scripts are executable
+chmod +x "$SCRIPT_DIR"/*.sh 2>/dev/null || true
+
 # Colors for terminal output
 RED='\033[0;31m'
 GREEN='\033[0;32m'

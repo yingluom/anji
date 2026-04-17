@@ -137,28 +137,23 @@ brew install protobuf swift-protobuf xcodegen
 
 ### Quick Build (Recommended)
 
-A build script is provided that handles the entire pipeline — dependency checks, Rust compilation, protobuf generation, Xcode project setup, archiving, and IPA packaging:
+One command to clone, set permissions, and build:
 
 ```bash
-git clone --recurse-submodules https://github.com/yingluom/anji.git
-cd anji
-
-# Full build: Rust + Swift -> unsigned IPA
-./scripts/build-local.sh
-
-# Skip Rust compilation (reuse existing XCFramework)
-./scripts/build-local.sh --skip-rust
-
-# Build for simulator only (fast iteration)
-./scripts/build-local.sh --sim
-
-# Clean all artifacts and rebuild from scratch
-./scripts/build-local.sh --clean
+git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji && bash scripts/build-local.sh
 ```
 
-The script checks for all prerequisites before starting. If anything is missing, it prints the exact install commands. Build logs are saved to `build/build.log` and errors are displayed with file paths and line numbers.
+The script automatically handles `chmod`, submodule initialization, dependency checks, Rust compilation, protobuf generation, Xcode project setup, archiving, and IPA packaging.
 
-Output IPA is at `build/AnjiApp-unsigned.ipa`.
+Other modes:
+
+```bash
+bash scripts/build-local.sh --skip-rust  # Reuse existing XCFramework
+bash scripts/build-local.sh --sim        # Simulator build (fast iteration)
+bash scripts/build-local.sh --clean      # Clean all artifacts and rebuild
+```
+
+Build logs are saved to `build/build.log`. On failure, errors are displayed with file paths and line numbers. Output IPA is at `build/AnjiApp-unsigned.ipa`.
 
 ### Manual Build Steps
 

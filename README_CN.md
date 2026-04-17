@@ -137,28 +137,23 @@ brew install protobuf swift-protobuf xcodegen
 
 ### 一键构建（推荐）
 
-项目提供了完整的本地构建脚本，自动处理依赖检查、Rust 编译、protobuf 生成、Xcode 项目配置、打包和 IPA 输出：
+一条命令完成克隆、权限设置和构建：
 
 ```bash
-git clone --recurse-submodules https://github.com/yingluom/anji.git
-cd anji
-
-# 完整构建：Rust + Swift -> 未签名 IPA
-./scripts/build-local.sh
-
-# 跳过 Rust 编译（复用已有的 XCFramework）
-./scripts/build-local.sh --skip-rust
-
-# 仅构建模拟器版本（快速迭代调试）
-./scripts/build-local.sh --sim
-
-# 清理所有产物后重新构建
-./scripts/build-local.sh --clean
+git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji && bash scripts/build-local.sh
 ```
 
-脚本会在开始前检查所有必需工具，缺少时给出安装命令。构建日志保存在 `build/build.log`，失败时自动提取错误信息并显示文件路径和行号。
+脚本自动处理 `chmod`、子模块初始化、依赖检查、Rust 编译、protobuf 生成、Xcode 项目配置、打包和 IPA 输出。
 
-输出 IPA 位于 `build/AnjiApp-unsigned.ipa`。
+其他模式：
+
+```bash
+bash scripts/build-local.sh --skip-rust  # 复用已有 XCFramework
+bash scripts/build-local.sh --sim        # 模拟器构建（快速迭代）
+bash scripts/build-local.sh --clean      # 清理所有产物后重建
+```
+
+构建日志保存在 `build/build.log`，失败时自动提取错误信息并显示文件路径和行号。输出 IPA 位于 `build/AnjiApp-unsigned.ipa`。
 
 ### 手动构建
 
