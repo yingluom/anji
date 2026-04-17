@@ -353,7 +353,7 @@
     "stats.reviews.empty": {
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "No review history yet" } },
-        "zh-Hans": { "stringUnit": { "stringUnit": { "state": "translated", "value": "暂无复习历史" } } }
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无复习历史" } }
       }
     },
     "stats.legend.learn": {
