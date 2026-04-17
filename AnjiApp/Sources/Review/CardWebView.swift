@@ -96,10 +96,11 @@ struct CardWebView: UIViewRepresentable {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <style>
+            /* Base styles */
             * { box-sizing: border-box; }
             html, body { margin: 0; padding: 0; background: transparent; }
             body {
-                font-family: -apple-system, system-ui, "Helvetica Neue", sans-serif;
+                font-family: -apple-system, system-ui, "Helvetica Neue", "Hiragino Sans", sans-serif;
                 font-size: 18px;
                 line-height: 1.6;
                 padding: 20px;
@@ -107,24 +108,111 @@ struct CardWebView: UIViewRepresentable {
                 word-wrap: break-word;
                 -webkit-text-size-adjust: 100%;
             }
-            @media (prefers-color-scheme: dark) {
-                body { color: #e8e8e8; }
-                hr { border-top-color: rgba(255,255,255,0.2) !important; }
+
+            /* Anki card template wrapper */
+            .card {
+                background: transparent;
+                color: inherit;
             }
+
+            /* Light mode colors */
+            .cloze { color: #007AFF; font-weight: 600; }
+            .cloze-inactive { color: #6c757d; font-weight: 600; }
+
+            /* Type comparison styles */
+            .typeGood, .typeGood a { color: #34C759; }
+            .typeBad, .typeBad a { color: #FF3B30; }
+            .typeMissed, .typeMissed a { color: #FF9500; }
+
+            /* Input field styling for type-in-answer */
+            input[type="text"], textarea {
+                font-family: inherit;
+                font-size: 18px;
+                padding: 8px 12px;
+                border: 1px solid rgba(128,128,128,0.4);
+                border-radius: 8px;
+                background: rgba(255,255,255,0.8);
+                color: inherit;
+                width: 100%;
+                max-width: 300px;
+            }
+            input[type="text"]:focus, textarea:focus {
+                outline: none;
+                border-color: #007AFF;
+            }
+
+            /* Media elements */
             img, video { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 8px auto; }
             hr { border: none; border-top: 1px solid rgba(0,0,0,0.15); margin: 16px 0; }
             audio { width: 100%; margin: 8px 0; }
-            .cloze { color: #007AFF; font-weight: 600; }
-            .typeGood { color: #34C759; }
-            .typeBad { color: #FF3B30; }
-            .typeMissed { color: #FF9500; }
-            table { border-collapse: collapse; margin: 8px 0; }
-            td, th { border: 1px solid rgba(128,128,128,0.3); padding: 6px 10px; }
-            code, pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: rgba(128,128,128,0.12); padding: 2px 6px; border-radius: 4px; }
-            pre { padding: 10px; overflow-x: auto; }
+
+            /* Tables */
+            table { border-collapse: collapse; margin: 8px 0; width: 100%; }
+            td, th { border: 1px solid rgba(128,128,128,0.3); padding: 6px 10px; text-align: left; }
+
+            /* Code blocks */
+            code, pre {
+                font-family: ui-monospace, "SF Mono", Menlo, "Cascadia Code", monospace;
+                background: rgba(128,128,128,0.12);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 0.9em;
+            }
+            pre { padding: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+
+            /* Links */
+            a { color: #007AFF; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+
+            /* Dark mode support */
+            @media (prefers-color-scheme: dark) {
+                body { color: #e8e8e8; }
+                hr { border-top-color: rgba(255,255,255,0.2) !important; }
+                .cloze { color: #5AC8FA; }
+                .cloze-inactive { color: #8e8e93; }
+                input[type="text"], textarea {
+                    background: rgba(30,30,30,0.8);
+                    border-color: rgba(255,255,255,0.2);
+                    color: #e8e8e8;
+                }
+                input[type="text"]:focus, textarea:focus {
+                    border-color: #5AC8FA;
+                }
+            }
+
+            /* Legacy Anki night mode classes */
+            .nightMode, .night_mode {
+                color: #e8e8e8 !important;
+            }
+            .nightMode .cloze, .night_mode .cloze { color: #5AC8FA; }
+            .nightMode .cloze-inactive, .night_mode .cloze-inactive { color: #8e8e93; }
+
+            /* Blockquotes */
+            blockquote {
+                border-left: 4px solid rgba(128,128,128,0.3);
+                margin: 8px 0;
+                padding-left: 16px;
+                color: inherit;
+            }
+
+            /* Lists */
+            ul, ol { padding-left: 24px; }
+            li { margin: 4px 0; }
+
+            /* MathJax/LaTeX rendering */
+            .math, .MathJax { font-size: 1em; }
+
+            /* Highlight marker */
+            mark { background: rgba(255, 214, 165, 0.5); padding: 1px 4px; border-radius: 3px; }
+
+            /* Additional card template helpers */
+            .hidden { display: none !important; }
+            .center { text-align: center; }
+            .left { text-align: left; }
+            .right { text-align: right; }
         </style>
         </head>
-        <body>\(bodyHTML)</body>
+        <body><div class="card">\(bodyHTML)</div></body>
         \(autoplayScript)
         </html>
         """

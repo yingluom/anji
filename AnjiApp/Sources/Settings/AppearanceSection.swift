@@ -60,24 +60,28 @@ struct AppearanceSection: View {
     }
 
     private var accentGrid: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 12) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
             ForEach(AccentPreset.allCases, id: \.self) { preset in
                 Button {
                     $accent.withLock { $0 = preset }
                 } label: {
                     ZStack {
-                        Circle().fill(preset.color).frame(width: 38, height: 38)
+                        Circle()
+                            .fill(preset.color)
+                            .frame(width: 28, height: 28)
                         if accent == preset {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundStyle(.white)
                         }
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)
+                .scaleEffect(accent == preset ? 1.1 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: accent == preset)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }

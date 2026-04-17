@@ -20,7 +20,7 @@ struct ReviewView: View {
                 HStack(spacing: Spacing.md) {
                     CountBadgesView(counts: session.remainingCounts)
                     Spacer()
-                    Text("\(session.stats.reviewed) reviewed")
+                    Text("review.cards_reviewed(\(session.stats.reviewed))")
                         .anjiFont(.callout)
                         .foregroundStyle(Color.anjiSecondary)
                 }
@@ -37,7 +37,7 @@ struct ReviewView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Done") { onDismiss() }
+                    Button("common.done") { onDismiss() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { session.undo() } label: {
@@ -60,17 +60,29 @@ struct ReviewView: View {
             if session.showingAnswer {
                 ratingButtons
             } else {
-                Button {
-                    withAnimation(.easeOut(duration: 0.2)) { session.revealAnswer() }
-                } label: {
-                    Text("Show Answer")
-                        .anjiFont(.bodyBold)
-                        .frame(maxWidth: .infinity)
-                        .padding()
+                HStack {
+                    Spacer()
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) { session.revealAnswer() }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "eye.fill")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text("review.show_answer")
+                                .font(.system(size: 15, weight: .semibold))
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                    }
+                    .background(
+                        Capsule()
+                            .fill(Color.anjiAccent)
+                    )
+                    .foregroundStyle(.white)
+                    .buttonStyle(.plain)
+                    Spacer()
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.anjiAccent)
-                .padding()
+                .padding(.vertical, 16)
             }
         }
     }
@@ -125,21 +137,21 @@ struct ReviewView: View {
                 .foregroundStyle(Color.anjiAccent.gradient)
                 .symbolEffect(.bounce, value: session.isFinished)
 
-            Text("Well Done!")
+            Text("review.well_done")
                 .anjiFont(.largeTitle)
                 .foregroundStyle(Color.anjiPrimary)
 
             VStack(spacing: Spacing.xs) {
-                Text("\(session.stats.reviewed) cards reviewed")
+                Text("review.cards_completed(\(session.stats.reviewed))")
                 if session.stats.reviewed > 0 {
-                    Text("Accuracy: \(Int(session.stats.accuracy * 100))%")
+                    Text("review.accuracy(\(Int(session.stats.accuracy * 100)))")
                 }
             }
             .anjiFont(.body)
             .foregroundStyle(Color.anjiSecondary)
 
             Spacer()
-            Button("Done") { onDismiss() }
+            Button("common.done") { onDismiss() }
                 .buttonStyle(AnjiPrimaryButton())
                 .padding()
         }

@@ -36,7 +36,7 @@ struct StorageSection: View {
                 Button {
                     showMediaLibrary = true
                 } label: {
-                    Label("View Media Library", systemImage: "photo.on.rectangle.angled")
+                    Label("settings.view_media_library", systemImage: "photo.on.rectangle.angled")
                 }
                 
                 Button(role: .destructive) {

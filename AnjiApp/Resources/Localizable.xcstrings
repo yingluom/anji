@@ -499,6 +499,48 @@
         "en": { "stringUnit": { "state": "translated", "value": "Clear URL Cache" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "清理 URL 缓存" } }
       }
+    },
+    "review.show_answer": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Show Answer" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "显示答案" } }
+      }
+    },
+    "review.well_done": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Well Done!" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "做得好！" } }
+      }
+    },
+    "review.cards_reviewed": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "%lld reviewed" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已复习 %lld" } }
+      }
+    },
+    "review.cards_completed": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "%lld cards reviewed" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已复习 %lld 张卡片" } }
+      }
+    },
+    "review.accuracy": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Accuracy: %lld%%" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "正确率：%lld%%" } }
+      }
+    },
+    "settings.view_media_library": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "View Media Library" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "查看媒体库" } }
+      }
+    },
+    "quote.load_error": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Failed to load quote. Tap to retry." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "加载失败，点击重试" } }
+      }
     }
   }
 }
