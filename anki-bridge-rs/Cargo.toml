@@ -14,5 +14,7 @@ prost = "0.13"
 
 [profile.release]
 opt-level = "s"
-lto = true
+lto = "thin"        # Thin LTO: ~3-5x faster linking than full LTO, negligible size impact
 strip = true
+codegen-units = 16  # Better parallelism during compilation
+incremental = false # Incremental + release doesn't mix well in CI caches

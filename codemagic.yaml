@@ -9,66 +9,85 @@ workflows:
       vars:
         XCODE_PROJECT: AnjiApp/AnjiApp.xcodeproj
         XCODE_SCHEME: AnjiApp
+        # Speed up Xcode: turn off indexing, compile in release mode
+        XCODE_FAST_FLAGS: >-
+          COMPILER_INDEX_STORE_ENABLE=NO
+          SWIFT_COMPILATION_MODE=wholemodule
 
     cache:
       cache_paths:
+        # Rust toolchain & dependency source cache
         - $HOME/.cargo/registry
         - $HOME/.cargo/git
         - $HOME/.rustup
+        # Rust compiled artifacts — biggest speed win on subsequent builds
+        - $CM_BUILD_DIR/anki-bridge-rs/target
+        # SwiftPM package cache
+        - $HOME/Library/Caches/org.swift.swiftpm
+        # Pre-built XCFramework (only re-zipped if fingerprint changes)
+        - $CM_BUILD_DIR/AnkiRust.xcframework
 
     scripts:
       - name: Install Rust toolchain
         script: |
+          set -euo pipefail
           if ! command -v rustup &> /dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+              | sh -s -- -y --default-toolchain stable --profile minimal
           fi
           source "$HOME/.cargo/env"
           rustup target add aarch64-apple-ios aarch64-apple-ios-sim
-          rustup show
+          rustc --version && cargo --version
 
       - name: Install build tools
         script: |
+          set -euo pipefail
+          # `|| true` tolerates "already installed" from brew
           brew install protobuf swift-protobuf xcodegen || true
+          protoc --version
+          xcodegen --version
 
       - name: Checkout git submodules
         script: |
-          git submodule update --init --recursive
+          set -euo pipefail
+          # --jobs for parallel clone of nested submodules
+          git submodule update --init --recursive --jobs 4
 
       - name: Build Rust XCFramework
         script: |
+          set -euo pipefail
           source "$HOME/.cargo/env"
           chmod +x scripts/build-xcframework.sh
           ./scripts/build-xcframework.sh
+          # Sanity check
+          [ -d "AnkiRust.xcframework" ] || { echo "XCFramework not produced"; exit 1; }
 
       - name: Generate Swift Protobuf types
         script: |
+          set -euo pipefail
           chmod +x scripts/generate-protos.sh
           ./scripts/generate-protos.sh
 
       - name: Generate Xcode project
         script: |
-          cd AnjiApp
-          xcodegen generate
-          cd ..
+          set -euo pipefail
+          (cd AnjiApp && xcodegen generate)
+          [ -d "$XCODE_PROJECT" ] || { echo "Xcode project not generated"; exit 1; }
 
       - name: Trust SwiftPM macros & plugins
         script: |
           # Xcode 16 requires explicit fingerprint approval for SwiftPM macros/plugins.
-          # On CI we cannot approve interactively, so skip validation via defaults.
+          # CI cannot approve interactively, so disable validation via defaults.
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
           defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM -bool YES
 
-      - name: Resolve SPM dependencies
-        script: |
-          xcodebuild -resolvePackageDependencies \
-            -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
-            -skipMacroValidation \
-            -skipPackagePluginValidation
-
       - name: Build unsigned IPA
         script: |
+          set -euo pipefail
+
+          # Archive directly — xcodebuild resolves SPM deps as part of archive,
+          # so a separate -resolvePackageDependencies step is redundant.
           xcodebuild archive \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
@@ -76,14 +95,22 @@ workflows:
             -archivePath build/AnjiApp.xcarchive \
             -skipMacroValidation \
             -skipPackagePluginValidation \
+            -parallelizeTargets \
+            -quiet \
+            $XCODE_FAST_FLAGS \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-          # Package unsigned IPA manually (xcodebuild -exportArchive requires signing)
+          APP_PATH="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
+          [ -d "$APP_PATH" ] || { echo "ERROR: .app not found in archive at $APP_PATH"; exit 1; }
+
+          # Package unsigned IPA manually — xcodebuild -exportArchive requires signing.
           mkdir -p build/ipa/Payload
-          cp -r build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app build/ipa/Payload/
-          cd build/ipa && zip -r ../AnjiApp-unsigned.ipa Payload
+          cp -R "$APP_PATH" build/ipa/Payload/
+          (cd build/ipa && zip -qry ../AnjiApp-unsigned.ipa Payload)
+
+          echo "==> IPA: $(du -h build/AnjiApp-unsigned.ipa | cut -f1)"
 
     artifacts:
       - build/AnjiApp-unsigned.ipa
