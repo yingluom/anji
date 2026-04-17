@@ -298,6 +298,28 @@ private struct StatItem: View {
     }
 }
 
+private struct StatItem: View {
+    let icon: String
+    let value: String
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+            Text(value)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Color.anjiPrimary)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(Color.anjiSecondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
 private struct MediaStatItem: View {
     let icon: String
     let count: Int
