@@ -51,11 +51,21 @@ workflows:
           xcodegen generate
           cd ..
 
+      - name: Trust SwiftPM macros & plugins
+        script: |
+          # Xcode 16 requires explicit fingerprint approval for SwiftPM macros/plugins.
+          # On CI we cannot approve interactively, so skip validation via defaults.
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+          defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
+          defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM -bool YES
+
       - name: Resolve SPM dependencies
         script: |
           xcodebuild -resolvePackageDependencies \
             -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME"
+            -scheme "$XCODE_SCHEME" \
+            -skipMacroValidation \
+            -skipPackagePluginValidation
 
       - name: Build unsigned IPA
         script: |
@@ -64,15 +74,17 @@ workflows:
             -scheme "$XCODE_SCHEME" \
             -destination "generic/platform=iOS" \
             -archivePath build/AnjiApp.xcarchive \
+            -skipMacroValidation \
+            -skipPackagePluginValidation \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-          xcodebuild -exportArchive \
-            -archivePath build/AnjiApp.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist scripts/ExportOptions.plist
+          # Package unsigned IPA manually (xcodebuild -exportArchive requires signing)
+          mkdir -p build/ipa/Payload
+          cp -r build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app build/ipa/Payload/
+          cd build/ipa && zip -r ../AnjiApp-unsigned.ipa Payload
 
     artifacts:
-      - build/ipa/*.ipa
+      - build/AnjiApp-unsigned.ipa
       - build/AnjiApp.xcarchive/**/*.app
