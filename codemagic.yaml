@@ -1,7 +1,7 @@
 workflows:
   ios-build:
     name: Anji iOS — Unsigned IPA
-    max_build_duration: 120
+    max_build_duration: 90
     instance_type: mac_mini_m2
 
     environment:
@@ -9,103 +9,107 @@ workflows:
       vars:
         XCODE_PROJECT: AnjiApp/AnjiApp.xcodeproj
         XCODE_SCHEME: AnjiApp
-        # Speed up Xcode: turn off indexing, compile in release mode
-        XCODE_FAST_FLAGS: >-
-          COMPILER_INDEX_STORE_ENABLE=NO
-          SWIFT_COMPILATION_MODE=wholemodule
+        # === Cache-friendly env ===
+        # All tool caches live under $HOME (outside $CM_BUILD_DIR), which is
+        # the only location Codemagic reliably preserves across builds.
+        CARGO_HOME: $HOME/.cargo
+        RUSTUP_HOME: $HOME/.rustup
+        CARGO_TARGET_DIR: $HOME/.cache/anji/cargo-target
+        SCCACHE_DIR: $HOME/.cache/anji/sccache
+        SCCACHE_CACHE_SIZE: 3G
+        RUSTC_WRAPPER: sccache
+        ANJI_CACHE: $HOME/.cache/anji
 
     cache:
       cache_paths:
-        # Rust toolchain & dependency source cache
-        - $HOME/.cargo/registry
-        - $HOME/.cargo/git
+        # Rust
+        - $HOME/.cargo
         - $HOME/.rustup
-        # Rust compiled artifacts — biggest speed win on subsequent builds
-        - $CM_BUILD_DIR/anki-bridge-rs/target
-        # SwiftPM package cache
+        - $HOME/.cache/anji/cargo-target
+        - $HOME/.cache/anji/sccache
+        # Pre-built XCFramework (fingerprint-gated restore in script)
+        - $HOME/.cache/anji/xcframework
+        # Swift Package Manager checkouts & resolved graph
         - $HOME/Library/Caches/org.swift.swiftpm
-        # Pre-built XCFramework (only re-zipped if fingerprint changes)
-        - $CM_BUILD_DIR/AnkiRust.xcframework
+        # Homebrew (so brew install is instant next time)
+        - /opt/homebrew/Cellar
+        - /opt/homebrew/var/homebrew
 
     scripts:
-      - name: Install Rust toolchain
+      # ---------------------------------------------------------------------
+      - name: Setup toolchain
         script: |
-          set -euo pipefail
-          if ! command -v rustup &> /dev/null; then
+          set -euxo pipefail
+
+          # Rust
+          if ! command -v rustup &>/dev/null; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
               | sh -s -- -y --default-toolchain stable --profile minimal
           fi
           source "$HOME/.cargo/env"
           rustup target add aarch64-apple-ios aarch64-apple-ios-sim
-          rustc --version && cargo --version
 
-      - name: Install build tools
-        script: |
-          set -euo pipefail
-          # `|| true` tolerates "already installed" from brew
-          brew install protobuf swift-protobuf xcodegen || true
+          # Build tools (idempotent; uses brew cache from previous run)
+          for pkg in protobuf swift-protobuf xcodegen sccache; do
+            brew list "$pkg" &>/dev/null || brew install "$pkg"
+          done
+
+          # Versions (for log diagnostics)
+          rustc --version
+          cargo --version
+          sccache --version
           protoc --version
           xcodegen --version
 
-      - name: Checkout git submodules
+      # ---------------------------------------------------------------------
+      - name: Fetch git submodules
         script: |
-          set -euo pipefail
-          # --jobs for parallel clone of nested submodules
+          set -euxo pipefail
           git submodule update --init --recursive --jobs 4
 
+      # ---------------------------------------------------------------------
       - name: Build Rust XCFramework
         script: |
-          set -euo pipefail
+          set -euxo pipefail
           source "$HOME/.cargo/env"
-          chmod +x scripts/build-xcframework.sh
+          mkdir -p "$ANJI_CACHE"
           ./scripts/build-xcframework.sh
-          # Sanity check
-          [ -d "AnkiRust.xcframework" ] || { echo "XCFramework not produced"; exit 1; }
+          sccache --show-stats || true
 
-      - name: Generate Swift Protobuf types
+      # ---------------------------------------------------------------------
+      - name: Generate protobufs & Xcode project
         script: |
-          set -euo pipefail
-          chmod +x scripts/generate-protos.sh
+          set -euxo pipefail
           ./scripts/generate-protos.sh
-
-      - name: Generate Xcode project
-        script: |
-          set -euo pipefail
           (cd AnjiApp && xcodegen generate)
-          [ -d "$XCODE_PROJECT" ] || { echo "Xcode project not generated"; exit 1; }
+          [ -d "$XCODE_PROJECT" ] || { echo "ERROR: Xcode project not generated"; exit 1; }
 
-      - name: Trust SwiftPM macros & plugins
+      # ---------------------------------------------------------------------
+      - name: Archive (ad-hoc signed)
         script: |
-          # Xcode 16 requires explicit fingerprint approval for SwiftPM macros/plugins.
-          # CI cannot approve interactively, so disable validation via defaults.
+          set -euxo pipefail
+
+          # Xcode 16 macro/plugin trust (CI can't approve interactively)
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
           defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM -bool YES
 
-      - name: Archive with ad-hoc signing
-        script: |
-          set -euo pipefail
-
-          # Clean previous build artifacts to avoid stale bundles
           rm -rf build
 
-          # Use ad-hoc signing ("-") instead of skipping signing entirely.
-          # CODE_SIGNING_ALLOWED=NO causes Xcode 16 to skip resource packaging
-          # and Swift runtime embedding — resulting in a near-empty .app.
-          # Ad-hoc produces a complete bundle with a fake signature that
-          # re-sign tools (SideStore/ESign/Sideloadly/etc.) strip & replace.
-          # -jobs uses all CPU cores; -dwarf skips dSYM for faster archive
-          JOBS=$(sysctl -n hw.ncpu)
+          # Ad-hoc ("-") signing produces a complete bundle (with Swift runtime,
+          # resources, and a placeholder signature) that re-sign tools like
+          # SideStore / ESign / Sideloadly strip and replace.
           xcodebuild archive \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath build/AnjiApp.xcarchive \
-            -jobs "$JOBS" \
+            -jobs "$(sysctl -n hw.ncpu)" \
             -skipMacroValidation \
             -skipPackagePluginValidation \
-            $XCODE_FAST_FLAGS \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            SWIFT_COMPILATION_MODE=wholemodule \
             DEBUG_INFORMATION_FORMAT=dwarf \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_STYLE=Manual \
@@ -115,51 +119,35 @@ workflows:
             ENABLE_BITCODE=NO \
             DEVELOPMENT_TEAM=""
 
-      - name: Verify archive contents
+      # ---------------------------------------------------------------------
+      - name: Package & verify IPA
         script: |
-          set -euo pipefail
+          set -euxo pipefail
 
           APP="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
           EXE="$APP/AnjiApp"
 
-          [ -d "$APP" ]             || { echo "ERROR: .app missing at $APP"; exit 1; }
-          [ -f "$EXE" ]             || { echo "ERROR: executable missing at $EXE"; exit 1; }
+          # ---- Verify the archive is a real iOS bundle ----
+          [ -d "$APP" ]             || { echo "ERROR: .app missing"; exit 1; }
+          [ -f "$EXE" ]             || { echo "ERROR: executable missing"; exit 1; }
           [ -f "$APP/Info.plist" ]  || { echo "ERROR: Info.plist missing"; exit 1; }
 
-          # Binary must be a valid arm64 iOS Mach-O
-          echo "=== Binary info ==="
+          echo "=== Binary ==="
           file "$EXE"
           lipo -info "$EXE" || true
 
-          # Non-empty executable check
           EXE_SIZE=$(stat -f%z "$EXE")
           echo "Executable size: $EXE_SIZE bytes"
-          [ "$EXE_SIZE" -gt 100000 ] || { echo "ERROR: executable suspiciously small (<100KB)"; exit 1; }
+          [ "$EXE_SIZE" -gt 100000 ] || { echo "ERROR: executable <100KB — build broken"; exit 1; }
 
-          # Bundle listing
           echo "=== .app top-level ==="
           ls -la "$APP"
-          echo "=== Frameworks/ (Swift runtime should be here) ==="
-          ls -la "$APP/Frameworks" 2>/dev/null || echo "(no Frameworks dir — OK on iOS 12.2+)"
-          echo "=== _CodeSignature/ ==="
-          ls -la "$APP/_CodeSignature" 2>/dev/null || echo "(no signature dir)"
 
-          # Total bundle size
-          APP_SIZE_KB=$(du -sk "$APP" | cut -f1)
-          echo "Bundle size: ${APP_SIZE_KB}KB"
-          [ "$APP_SIZE_KB" -gt 500 ] || {
-              echo "ERROR: .app is only ${APP_SIZE_KB}KB — build produced a near-empty bundle"
-              exit 1
-          }
+          APP_KB=$(du -sk "$APP" | cut -f1)
+          echo "Bundle size: ${APP_KB}KB"
+          [ "$APP_KB" -gt 500 ] || { echo "ERROR: .app ${APP_KB}KB — build produced near-empty bundle"; exit 1; }
 
-      - name: Package unsigned IPA
-        script: |
-          set -euo pipefail
-
-          APP="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
-
-          # xcodebuild -exportArchive needs a real cert for ad-hoc method,
-          # so we package manually: Payload/AnjiApp.app → zip → .ipa
+          # ---- Package IPA ----
           mkdir -p build/ipa/Payload
           cp -R "$APP" build/ipa/Payload/
           (cd build/ipa && zip -ry ../AnjiApp-unsigned.ipa Payload)
@@ -167,17 +155,10 @@ workflows:
           IPA=build/AnjiApp-unsigned.ipa
           IPA_SIZE=$(stat -f%z "$IPA")
           echo "==> IPA: $IPA ($(du -h "$IPA" | cut -f1), $IPA_SIZE bytes)"
+          [ "$IPA_SIZE" -gt 500000 ] || { echo "ERROR: IPA <500KB"; exit 1; }
 
-          # Sanity check: any real iOS app IPA is >= several MB
-          [ "$IPA_SIZE" -gt 500000 ] || {
-              echo "ERROR: IPA is only $IPA_SIZE bytes — packaging broken"
-              exit 1
-          }
-
-          # Dump IPA contents for inspection
-          echo "=== IPA contents ==="
-          unzip -l "$IPA" | head -40
+          echo "=== IPA contents (top 30) ==="
+          unzip -l "$IPA" | head -30
 
     artifacts:
       - build/AnjiApp-unsigned.ipa
-      - build/AnjiApp.xcarchive/**/*.app
