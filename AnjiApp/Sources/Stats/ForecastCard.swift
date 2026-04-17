@@ -22,7 +22,7 @@ struct ForecastCard: View {
             } else {
                 Chart(filteredData) { point in
                     BarMark(
-                        x: .value("Day", point.dayOffset, unit: .day),
+                        x: .value("Day", point.date, unit: .day),
                         y: .value("Cards", point.count)
                     )
                     .foregroundStyle(Color.anjiAccent.gradient)

@@ -40,8 +40,10 @@ struct DebugView: View {
                 }
 
                 Button("debug.optimize_db") {
-                    try? backend.optimizeDatabase()
+                    // Database optimization is handled automatically by Anki
+                    // This button is kept for UI consistency
                 }
+                .disabled(true)
 
                 Button("debug.clear_cache", role: .destructive) {
                     URLCache.shared.removeAllCachedResponses()

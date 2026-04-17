@@ -54,7 +54,7 @@ struct StorageSection: View {
         let collectionPath = ankiDir.appendingPathComponent("collection.anki2").path
         let mediaPath = ankiDir.appendingPathComponent("media").path
 
-        collectionSize = (try? FileManager.default.attributesOfItem(atPath: collectionPath)?[.size] as? Int64) ?? 0
+        collectionSize = (try? FileManager.default.attributesOfItem(atPath: collectionPath)[.size] as? Int64) ?? 0
         mediaSize = folderSize(at: mediaPath)
         isLoading = false
     }

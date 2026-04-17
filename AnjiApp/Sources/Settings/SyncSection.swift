@@ -1,5 +1,6 @@
 import SwiftUI
 import Sharing
+import AnkiSync
 
 /// Sync settings — server, account, auto-sync, media.
 struct SyncSection: View {
