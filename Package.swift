@@ -6,7 +6,7 @@ let sharedSwiftSettings: [SwiftSetting] = []
 
 let package = Package(
     name: "AnjiBridge",
-    platforms: [.iOS(.v17), .macOS(.v14)],
+    platforms: [.iOS(.v18), .macOS(.v14)],
     products: [
         .library(name: "AnkiKit", targets: ["AnkiKit"]),
         .library(name: "AnkiProto", targets: ["AnkiProto"]),
