@@ -9,9 +9,19 @@ struct SyncSheet: View {
     @Dependency(\.syncClient) var syncClient
     @State private var state: SyncState = .idle
     @State private var showLogin = false
+    @State private var syncLogs: [String] = []
+    @State private var mediaProgress: MediaSyncProgress = .init()
 
     enum SyncState {
         case idle, syncing(String), success(SyncSummary), error(String), needsFullSync
+    }
+    
+    struct MediaSyncProgress {
+        var downloaded: Int = 0
+        var uploaded: Int = 0
+        var removed: Int = 0
+        var currentFile: String = ""
+        var isActive: Bool = false
     }
 
     var body: some View {
@@ -69,6 +79,45 @@ struct SyncSheet: View {
                 Text(msg)
                     .anjiFont(.body)
                     .foregroundStyle(Color.anjiSecondary)
+                
+                // Media sync progress
+                if mediaProgress.isActive {
+                    VStack(spacing: Spacing.sm) {
+                        ProgressView(value: Double(mediaProgress.downloaded + mediaProgress.uploaded), 
+                                   total: Double(max(mediaProgress.downloaded + mediaProgress.uploaded + 1, 10)))
+                        HStack(spacing: Spacing.sm) {
+                            Label("\(mediaProgress.downloaded)", systemImage: "arrow.down.circle")
+                            Label("\(mediaProgress.uploaded)", systemImage: "arrow.up.circle")
+                            Label("\(mediaProgress.removed)", systemImage: "trash")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color.anjiTertiary)
+                        if !mediaProgress.currentFile.isEmpty {
+                            Text(mediaProgress.currentFile)
+                                .font(.caption2)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .foregroundStyle(Color.anjiSecondary)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // Sync logs
+                if !syncLogs.isEmpty {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 2) {
+                            ForEach(syncLogs.suffix(5), id: \.self) { log in
+                                Text(log)
+                                    .font(.caption2)
+                                    .foregroundStyle(Color.anjiTertiary)
+                                    .lineLimit(1)
+                            }
+                        }
+                    }
+                    .frame(height: 80)
+                    .padding(.horizontal)
+                }
             }
         case .success(let summary):
             VStack(spacing: Spacing.md) {
@@ -132,20 +181,56 @@ struct SyncSheet: View {
         guard KeychainHelper.loadHostKey() != nil else {
             showLogin = true; return
         }
+        
+        syncLogs.removeAll()
+        mediaProgress = .init()
 
         state = .syncing("Syncing collection…")
+        addLog("Connecting to AnkiWeb...")
+        
         do {
             let summary = try await syncClient.sync()
+            addLog("Collection sync complete")
+            
             state = .syncing("Syncing media…")
-            _ = try? await syncClient.syncMedia()
+            mediaProgress.isActive = true
+            addLog("Starting media sync...")
+            
+            do {
+                let mediaSummary = try await syncMediaWithProgress()
+                addLog("Media sync complete: \(mediaSummary.downloaded) downloaded, \(mediaSummary.uploaded) uploaded")
+            } catch {
+                addLog("Media sync failed: \(error.localizedDescription)")
+                // Don't fail entire sync if media fails
+            }
+            
             state = .success(summary)
         } catch let e as SyncError where e == .authFailed {
             showLogin = true; state = .idle
         } catch let e as SyncError where e == .fullSyncRequired {
             state = .needsFullSync
         } catch {
+            addLog("Sync failed: \(error.localizedDescription)")
             state = .error(error.localizedDescription)
         }
+    }
+    
+    private func addLog(_ message: String) {
+        let timestamp = ISO8601DateFormatter().string(from: Date())
+        syncLogs.append("[\(timestamp.prefix(19))] \(message)")
+    }
+    
+    private func syncMediaWithProgress() async throws -> MediaSyncSummary {
+        // This would ideally use a streaming API from SyncService
+        // For now, we call the basic sync and simulate progress
+        let summary = try await syncClient.syncMedia()
+        
+        // Update progress based on actual results
+        mediaProgress.downloaded = summary.downloaded
+        mediaProgress.uploaded = summary.uploaded
+        mediaProgress.removed = summary.removed
+        
+        return summary
     }
 
     private func fullSync(_ direction: SyncDirection) async {

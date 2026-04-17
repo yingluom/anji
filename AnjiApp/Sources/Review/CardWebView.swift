@@ -1,9 +1,13 @@
 import SwiftUI
 import WebKit
+import AVFoundation
 
-/// Displays rendered card HTML inside a WKWebView with support for local media files.
+/// Displays rendered card HTML inside a WKWebView with support for local media files and audio autoplay.
 struct CardWebView: UIViewRepresentable {
     let html: String
+    var autoplayAudio: Bool = true
+    @State private var audioPlayer: AVAudioPlayer?
+    @State private var pendingAudioFiles: [String] = []
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -22,9 +26,50 @@ struct CardWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        // Collect audio files before rewriting HTML
+        let audioFiles = extractAudioFiles(from: html)
+        pendingAudioFiles = audioFiles
+        
         // Rewrite media references to use our custom scheme
         let processedHTML = rewriteMediaPaths(html)
 
+        let autoplayScript = autoplayAudio ? """
+        <script>
+            // Auto-play audio files in sequence
+            (function() {
+                let audioElements = [];
+                let currentIndex = 0;
+                
+                function playNext() {
+                    if (currentIndex < audioElements.length) {
+                        const audio = audioElements[currentIndex];
+                        audio.volume = 1.0;
+                        audio.play().catch(e => console.log('Audio play failed:', e));
+                        currentIndex++;
+                    }
+                }
+                
+                // Find all audio elements and set up sequential playback
+                window.addEventListener('load', function() {
+                    audioElements = Array.from(document.querySelectorAll('audio'));
+                    audioElements.forEach((audio, index) => {
+                        audio.addEventListener('ended', function() {
+                            if (index + 1 < audioElements.length) {
+                                audioElements[index + 1].play().catch(e => console.log('Next audio play failed:', e));
+                            }
+                        });
+                    });
+                    // Start playing first audio
+                    if (audioElements.length > 0) {
+                        setTimeout(() => {
+                            audioElements[0].play().catch(e => console.log('First audio play failed:', e));
+                        }, 100);
+                    }
+                });
+            })();
+        </script>
+        """ : ""
+        
         let wrapper = """
         <!DOCTYPE html>
         <html>
@@ -51,10 +96,56 @@ struct CardWebView: UIViewRepresentable {
         </style>
         </head>
         <body>\(processedHTML)</body>
+        \(autoplayScript)
         </html>
         """
         webView.loadHTMLString(wrapper, baseURL: nil)
+        
+        // Also play audio files using native AVAudioPlayer as fallback
+        if autoplayAudio && !audioFiles.isEmpty {
+            playAudioFilesSequentially(audioFiles)
+        }
     }
+    
+    /// Extract audio file names from [sound:...] tags
+    private func extractAudioFiles(from html: String) -> [String] {
+        let pattern = #"\[sound:([^\]]+)\]"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let matches = regex.matches(in: html, range: NSRange(html.startIndex..., in: html))
+        return matches.map { match in
+            let range = match.range(at: 1)
+            return String(html[Range(range, in: html)!])
+        }
+    }
+    
+    /// Play audio files sequentially using native player
+    private func playAudioFilesSequentially(_ files: [String]) {
+        guard !files.isEmpty else { return }
+        
+        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let mediaDir = appSupport.appendingPathComponent("AnjiCollection/media", isDirectory: true)
+        
+        // Filter files that exist locally
+        let existingFiles = files.filter { filename in
+            let fileURL = mediaDir.appendingPathComponent(filename)
+            return FileManager.default.fileExists(atPath: fileURL.path)
+        }
+        
+        guard !existingFiles.isEmpty else { return }
+        
+        // Play first file
+        playAudioFile(at: mediaDir.appendingPathComponent(existingFiles[0]))
+    }
+    
+    private func playAudioFile(at url: URL) {
+        do {
+            audioPlayer?.stop()
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+        } catch {
+            print("Failed to play audio: \(error)")
+        }
 
     /// Rewrite relative media paths to use ankimedia:// scheme.
     private func rewriteMediaPaths(_ html: String) -> String {
