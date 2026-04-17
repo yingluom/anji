@@ -4,58 +4,86 @@ workflows:
     max_build_duration: 120
     environment:
       xcode: latest
+    cache:
+      cache_paths:
+        - $HOME/.cargo/registry
+        - $HOME/.cargo/git
+        - $CM_BUILD_DIR/anki-bridge-rs/target
 
     scripts:
       - name: Install Rust + build tools
         script: |
-          set -e
+          set -euo pipefail
+          echo "--- Installing Homebrew packages ---"
           brew install protobuf swift-protobuf xcodegen
+
+          echo "--- Setting up Rust toolchain ---"
           if ! command -v rustup >/dev/null 2>&1; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
               | sh -s -- -y --default-toolchain stable --profile minimal
           fi
           source "$HOME/.cargo/env"
           rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+
+          echo "--- Tool versions ---"
           rustc --version
+          cargo --version
           protoc --version
           xcodegen --version
+          xcodebuild -version
 
       - name: Checkout submodules
         script: |
-          set -e
+          set -euo pipefail
           git submodule update --init --recursive
 
       - name: Build Rust XCFramework
         script: |
-          set -e
+          set -euo pipefail
           source "$HOME/.cargo/env"
+          START=$(date +%s)
           bash scripts/build-xcframework.sh
+          echo "--- Rust build took $(( $(date +%s) - START ))s ---"
 
       - name: Generate protobufs & Xcode project
         script: |
-          set -e
+          set -euo pipefail
           bash scripts/generate-protos.sh
-          cd AnjiApp
-          xcodegen generate
-          cd ..
+          cd AnjiApp && xcodegen generate && cd ..
 
-      - name: Trust Xcode 16 macros
+      - name: Trust Xcode macros
         script: |
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
 
+      - name: Resolve Swift packages
+        script: |
+          set -euo pipefail
+          echo "--- Resolving SPM dependencies ---"
+          START=$(date +%s)
+          xcodebuild -resolvePackageDependencies \
+            -project AnjiApp/AnjiApp.xcodeproj \
+            -scheme AnjiApp \
+            -clonedSourcePackagesDirPath build/spm_cache
+          echo "--- SPM resolve took $(( $(date +%s) - START ))s ---"
+
       - name: Archive (ad-hoc signed)
         script: |
-          set -e
-          rm -rf build
+          set -euo pipefail
+          rm -rf build/AnjiApp.xcarchive
+          echo "--- Starting xcodebuild archive ---"
+          START=$(date +%s)
+
           xcodebuild archive \
             -project AnjiApp/AnjiApp.xcodeproj \
             -scheme AnjiApp \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath build/AnjiApp.xcarchive \
+            -clonedSourcePackagesDirPath build/spm_cache \
             -skipMacroValidation \
             -skipPackagePluginValidation \
+            -parallelizeTargets \
             DEBUG_INFORMATION_FORMAT=dwarf \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_STYLE=Manual \
@@ -63,11 +91,27 @@ workflows:
             CODE_SIGNING_ALLOWED=YES \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
             ENABLE_BITCODE=NO \
-            DEVELOPMENT_TEAM=""
+            DEVELOPMENT_TEAM="" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee build/xcodebuild.log
+
+          RESULT=${PIPESTATUS[0]}
+          echo "--- Archive took $(( $(date +%s) - START ))s ---"
+
+          if [ $RESULT -ne 0 ]; then
+            echo ""
+            echo "========== BUILD ERRORS =========="
+            grep -n "error:" build/xcodebuild.log | head -30
+            echo ""
+            echo "========== ERROR CONTEXT =========="
+            grep -B2 -A2 "error:" build/xcodebuild.log | head -80
+            echo "==================================="
+            exit $RESULT
+          fi
 
       - name: Package IPA & verify
         script: |
-          set -e
+          set -euo pipefail
           APP="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
 
           if [ ! -f "$APP/AnjiApp" ]; then
@@ -95,3 +139,4 @@ workflows:
 
     artifacts:
       - build/AnjiApp-unsigned.ipa
+      - build/xcodebuild.log
