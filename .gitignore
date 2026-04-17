@@ -33,3 +33,7 @@ Sources/AnkiProto/*.pb.swift
 *~
 .idea/
 .vscode/
+
+# === Local-only notes ===
+PROMPT.md
+*.log

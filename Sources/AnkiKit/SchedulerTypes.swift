@@ -1,4 +1,4 @@
-package import Foundation
+import Foundation
 
 /// Opaque token wrapping serialized protobuf scheduling state bytes.
 /// The app layer holds these tokens but never inspects them — only the
