@@ -10,18 +10,11 @@ struct SyncSheet: View {
     @State private var state: SyncState = .idle
     @State private var showLogin = false
     @State private var syncLogs: [String] = []
-    @State private var mediaProgress: MediaSyncProgress = .init()
+    @State private var mediaProgress: AnkiKit.MediaSyncProgress = .init()
+    @State private var isMediaSyncActive = false
 
     enum SyncState {
         case idle, syncing(String), success(SyncSummary), error(String), needsFullSync
-    }
-    
-    struct MediaSyncProgress {
-        var downloaded: Int = 0
-        var uploaded: Int = 0
-        var removed: Int = 0
-        var currentFile: String = ""
-        var isActive: Bool = false
     }
 
     var body: some View {
@@ -193,16 +186,31 @@ struct SyncSheet: View {
             addLog("Collection sync complete")
             
             state = .syncing("Syncing media…")
-            mediaProgress.isActive = true
+            isMediaSyncActive = true
+            mediaProgress = AnkiKit.MediaSyncProgress(currentOperation: .checking)
             addLog("Starting media sync...")
             
             do {
-                let mediaSummary = try await syncMediaWithProgress()
-                addLog("Media sync complete: \(mediaSummary.downloaded) downloaded, \(mediaSummary.uploaded) uploaded")
+                // Use the new progress-based API
+                let mediaSummary = try await syncClient.syncMediaWithProgress { progress in
+                    // Update UI on main thread
+                    DispatchQueue.main.async {
+                        mediaProgress = progress
+                        // Log significant progress changes
+                        if progress.currentOperation == .downloading && progress.checked > 0 {
+                            addLog("Checking: \(progress.checked) files...")
+                        }
+                        if !progress.currentFile.isEmpty {
+                            addLog("\(progress.currentOperation): \(progress.currentFile)")
+                        }
+                    }
+                }
+                addLog("Media sync complete: \(mediaSummary.downloaded) downloaded, \(mediaSummary.uploaded) uploaded, \(mediaSummary.removed) removed")
             } catch {
                 addLog("Media sync failed: \(error.localizedDescription)")
                 // Don't fail entire sync if media fails
             }
+            isMediaSyncActive = false
             
             state = .success(summary)
         } catch let e as SyncError where e == .authFailed {
@@ -220,17 +228,14 @@ struct SyncSheet: View {
         syncLogs.append("[\(timestamp.prefix(19))] \(message)")
     }
     
-    private func syncMediaWithProgress() async throws -> MediaSyncSummary {
-        // This would ideally use a streaming API from SyncService
-        // For now, we call the basic sync and simulate progress
-        let summary = try await syncClient.syncMedia()
-        
-        // Update progress based on actual results
-        mediaProgress.downloaded = summary.downloaded
-        mediaProgress.uploaded = summary.uploaded
-        mediaProgress.removed = summary.removed
-        
-        return summary
+    private func formatOperation(_ op: MediaSyncOperation) -> String {
+        switch op {
+        case .checking: return "Checking"
+        case .downloading: return "Downloading"
+        case .uploading: return "Uploading"
+        case .removing: return "Removing"
+        case .complete: return "Complete"
+        }
     }
 
     private func fullSync(_ direction: SyncDirection) async {

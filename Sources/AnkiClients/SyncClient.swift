@@ -7,6 +7,9 @@ public struct SyncClient: Sendable {
     public var sync: @Sendable () async throws -> SyncSummary
     public var fullSync: @Sendable (_ direction: SyncDirection) async throws -> Void
     public var syncMedia: @Sendable () async throws -> MediaSyncSummary
+    public var syncMediaWithProgress: @Sendable (
+        _ onProgress: @escaping @Sendable (MediaSyncProgress) -> Void
+    ) async throws -> MediaSyncSummary
 }
 
 extension SyncClient: TestDependencyKey {

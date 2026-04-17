@@ -146,7 +146,8 @@ struct CardWebView: UIViewRepresentable {
         } catch {
             print("Failed to play audio: \(error)")
         }
-
+    }
+    
     /// Rewrite relative media paths to use ankimedia:// scheme.
     private func rewriteMediaPaths(_ html: String) -> String {
         // Match src="filename.jpg" or [sound:filename.mp3]

@@ -34,6 +34,13 @@ extension SyncClient: DependencyKey {
                 let endpoint = KeychainHelper.loadEndpoint() ?? ankiWebEndpoint
                 try await syncService.syncMedia(endpoint, hostKey)
                 return MediaSyncSummary()
+            },
+            syncMediaWithProgress: { onProgress in
+                guard let hostKey = KeychainHelper.loadHostKey(), !hostKey.isEmpty else {
+                    throw SyncError.authFailed
+                }
+                let endpoint = KeychainHelper.loadEndpoint() ?? ankiWebEndpoint
+                return try await syncService.syncMediaWithProgress(endpoint, hostKey, onProgress)
             }
         )
     }()
