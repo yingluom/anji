@@ -185,7 +185,7 @@ private struct StatCard: View {
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.anjiCardBackground)
+                .fill(Color.anjiSurface)
                 .shadow(color: .black.opacity(0.05), radius: 8)
         )
     }
@@ -218,7 +218,7 @@ private struct MediaFileRow: View {
                         .font(.caption)
                         .foregroundStyle(Color.anjiSecondary)
                     
-                    Text("•")
+                    Text("�?)
                         .font(.caption)
                         .foregroundStyle(Color.anjiTertiary)
                     
@@ -261,12 +261,17 @@ private struct MediaPreviewSheet: View {
             Group {
                 switch file.type {
                 case .image:
-                    AsyncImage(url: file.url) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                    } placeholder: {
-                        ProgressView()
+                    AsyncImage(url: file.url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image.resizable().scaledToFit()
+                        case .failure:
+                            Image(systemName: "photo")
+                                .font(.largeTitle)
+                                .foregroundStyle(.secondary)
+                        default:
+                            ProgressView()
+                        }
                     }
                 case .audio:
                     AudioPlayerView(url: file.url)

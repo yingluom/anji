@@ -64,7 +64,7 @@ struct SyncSheet: View {
     private var stateView: some View {
         switch state {
         case .idle:
-            ProgressView("Preparing…")
+            ProgressView("Preparing�?)
         case .syncing(let msg):
             ScrollView {
                 VStack(spacing: Spacing.lg) {
@@ -101,7 +101,7 @@ struct SyncSheet: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.anjiCardBackground)
+                            .fill(Color.anjiSurface)
                     )
                     .padding(.horizontal)
                     
@@ -197,7 +197,7 @@ struct SyncSheet: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.anjiCardBackground)
+                            .fill(Color.anjiSurface)
                     )
                     .padding(.horizontal)
                     
@@ -239,7 +239,7 @@ struct SyncSheet: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.anjiCardBackground)
+                                .fill(Color.anjiSurface)
                         )
                         .padding(.horizontal)
                     }
@@ -276,28 +276,6 @@ struct SyncSheet: View {
 }
 
 // MARK: - Stat Item Views
-
-private struct StatItem: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(color)
-            Text(value)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Color.anjiPrimary)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(Color.anjiSecondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
 
 private struct StatItem: View {
     let icon: String
@@ -389,14 +367,14 @@ extension SyncSheet {
         syncLogs.removeAll()
         mediaProgress = .init()
 
-        state = .syncing("Syncing collection…")
+        state = .syncing("Syncing collection�?)
         addLog("Connecting to AnkiWeb...")
         
         do {
             let summary = try await syncClient.sync()
             addLog("Collection sync complete")
             
-            state = .syncing("Syncing media…")
+            state = .syncing("Syncing media�?)
             isMediaSyncActive = true
             mediaProgress = AnkiKit.MediaSyncProgress(currentOperation: .checking)
             addLog("Starting media sync...")
@@ -450,7 +428,7 @@ extension SyncSheet {
     }
 
     private func fullSync(_ direction: SyncDirection) async {
-        state = .syncing(direction == .download ? "Downloading…" : "Uploading…")
+        state = .syncing(direction == .download ? "Downloading�? : "Uploading�?)
         do {
             try await syncClient.fullSync(direction)
             state = .success(SyncSummary())
