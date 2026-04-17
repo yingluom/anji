@@ -30,25 +30,44 @@
 
 Anji is an open-source iOS flashcard application that brings the full power of [Anki](https://apps.ankiweb.net/) to your iPhone and iPad. Built on the official Anki Rust backend (`rslib`), it ensures 100% compatibility with AnkiWeb sync, FSRS scheduling, and all Anki card features.
 
-## ✨ Features
+## Features
 
-| Feature | Description |
-|---------|-------------|
-| 🔄 **AnkiWeb Sync** | Full bidirectional sync for collections and media files |
-| 🧠 **FSRS Algorithm** | Next-generation spaced repetition scheduling |
-| 📊 **Statistics** | Today overview, Forecast, Review History, Intervals, and Ease charts |
-| 🎨 **Beautiful Themes** | Light/Dark/System mode with 6 accent colors |
-| 🌐 **Bilingual UI** | English and Simplified Chinese interface |
-| 🎵 **Rich Media** | Images, audio, and video support in cards |
-| 🔍 **Card Browser** | Search, filter, and manage your cards |
-| 📱 **Native iOS** | Built with SwiftUI for optimal performance |
-| ⚙️ **Advanced Settings** | Customizable review options, sync settings, and debug tools |
+Anji provides a complete set of features for effective spaced repetition learning:
 
-## 📥 Installation
+**Sync & Data**
+- AnkiWeb Sync: Full bidirectional synchronization for both collection data and media files
+- Incremental sync with progress tracking
+- Media file integrity verification with MD5 checksums
+- Automatic download of missing or corrupted media files
+
+**Learning System**
+- FSRS Algorithm: Next-generation spaced repetition scheduling algorithm for optimal retention
+- Card Browser: Search, filter, and manage your cards with advanced query support
+- Custom Study: Create filtered decks for focused review sessions
+- Tag Management: Organize cards with hierarchical tags
+
+**Study Interface**
+- Clean, distraction-free review interface
+- Support for all Anki card types: Standard, Cloze, Type-in answers, and more
+- Rich media support: Images, audio, and video playback in cards
+- Night mode and three theme variants (Light, Dark, System)
+
+**Statistics & Analytics**
+- Today Overview: See due cards, reviews completed, and study time
+- Forecast Chart: Visualize upcoming review workload
+- Review History: Track your learning progress over time
+- Intervals & Ease Charts: Understand card difficulty distributions
+
+**Localization**
+- Full English and Simplified Chinese interface
+- RTL language support preparation
+- Locale-aware date and number formatting
+
+## Installation
 
 ### Sideload (Recommended)
 
-Anji is distributed as an unsigned IPA. You can install it using:
+Anji is distributed as an unsigned IPA. You can install it using one of the following tools:
 
 | Tool | Cost | Computer Required | Notes |
 |------|------|-------------------|-------|
@@ -57,9 +76,9 @@ Anji is distributed as an unsigned IPA. You can install it using:
 | [AltStore](https://altstore.io/) | Free | Yes | Popular alternative |
 | ESign / Scarlet | Paid | No | Uses developer certificates |
 
-📦 **[Download Latest IPA →](https://github.com/yingluom/anji/releases/latest)**
+[Download Latest IPA](https://github.com/yingluom/anji/releases/latest)
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -98,7 +117,7 @@ Anji is distributed as an unsigned IPA. You can install it using:
 - `anki_run_method` (protobuf request → response)
 - `anki_free_response`
 
-## 🛠️ Build from Source
+## Build from Source
 
 ### Requirements
 
@@ -134,25 +153,25 @@ cd AnjiApp && xcodegen generate && cd ..
 open AnjiApp/AnjiApp.xcodeproj
 ```
 
-## 🚀 Continuous Integration
+## Continuous Integration
 
 Automated builds powered by [Codemagic](https://codemagic.io):
 
-- ✅ Every commit triggers a full build
-- ✅ Produces unsigned IPA artifacts
-- ✅ Runs unit tests and linting
+- Every commit triggers a full build
+- Produces unsigned IPA artifacts
+- Runs unit tests and linting
 
 See [`codemagic.yaml`](codemagic.yaml) for configuration.
 
-## � License
+## License
 
 **AGPL-3.0** — This project uses the [ankitects/anki](https://github.com/ankitects/anki) Rust backend, which is licensed under AGPL-3.0. All derivative work must comply with this license.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting PRs.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Anki](https://apps.ankiweb.net/) by Damien Elmes - The original spaced repetition software
 - [ankitects/anki](https://github.com/ankitects/anki) - The official Anki Rust backend
@@ -161,5 +180,5 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 ---
 
 <p align="center">
-  Made with ❤️ for learners worldwide
+  Made for learners worldwide
 </p>
