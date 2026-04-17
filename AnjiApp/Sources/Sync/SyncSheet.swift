@@ -66,51 +66,185 @@ struct SyncSheet: View {
         case .idle:
             ProgressView("Preparing…")
         case .syncing(let msg):
-            VStack(spacing: Spacing.md) {
-                ProgressView()
-                    .controlSize(.large)
-                Text(msg)
-                    .anjiFont(.body)
-                    .foregroundStyle(Color.anjiSecondary)
-                
-                // Media sync progress
-                if isMediaSyncActive {
+            ScrollView {
+                VStack(spacing: Spacing.lg) {
+                    // Header with main progress
                     VStack(spacing: Spacing.sm) {
-                        ProgressView(value: Double(mediaProgress.downloaded + mediaProgress.uploaded), 
-                                   total: Double(max(mediaProgress.downloaded + mediaProgress.uploaded + 1, 10)))
-                        HStack(spacing: Spacing.sm) {
-                            Label("\(mediaProgress.downloaded)", systemImage: "arrow.down.circle")
-                            Label("\(mediaProgress.uploaded)", systemImage: "arrow.up.circle")
-                            Label("\(mediaProgress.removed)", systemImage: "trash")
+                        ProgressView()
+                            .controlSize(.large)
+                        Text(msg)
+                            .anjiFont(.body)
+                            .foregroundStyle(Color.anjiSecondary)
+                    }
+                    
+                    // Collection sync stats card
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "rectangle.stack")
+                                .foregroundStyle(Color.anjiAccent)
+                            Text("Collection Sync")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Spacer()
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(Color.anjiSuccess)
+                                .opacity(msg.contains("media") ? 1 : 0)
                         }
-                        .font(.caption)
-                        .foregroundStyle(Color.anjiTertiary)
-                        if !mediaProgress.currentFile.isEmpty {
-                            Text(mediaProgress.currentFile)
-                                .font(.caption2)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
-                                .foregroundStyle(Color.anjiSecondary)
+                        
+                        Divider()
+                        
+                        HStack(spacing: 16) {
+                            StatItem(icon: "arrow.down.circle.fill", value: "Done", label: "Download", color: .blue)
+                            StatItem(icon: "arrow.up.circle.fill", value: "Done", label: "Upload", color: .green)
                         }
                     }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.anjiCardBackground)
+                    )
                     .padding(.horizontal)
-                }
-                
-                // Sync logs
-                if !syncLogs.isEmpty {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 2) {
-                            ForEach(syncLogs.suffix(5), id: \.self) { log in
-                                Text(log)
-                                    .font(.caption2)
-                                    .foregroundStyle(Color.anjiTertiary)
-                                    .lineLimit(1)
+                    
+                    // Media sync progress card
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .foregroundStyle(Color.purple)
+                            Text("Media Sync")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Spacer()
+                            if isMediaSyncActive {
+                                Text(formatOperation(mediaProgress.currentOperation))
+                                    .font(.caption)
+                                    .foregroundStyle(Color.anjiAccent)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.anjiAccent.opacity(0.1))
+                                    .cornerRadius(8)
                             }
                         }
+                        
+                        if isMediaSyncActive {
+                            Divider()
+                            
+                            // Progress bar
+                            VStack(alignment: .leading, spacing: 8) {
+                                ProgressView(value: mediaProgress.progress)
+                                    .tint(Color.purple)
+                                
+                                HStack {
+                                    Text("\(mediaProgress.checked + mediaProgress.downloaded + mediaProgress.uploaded) / \(mediaProgress.totalFiles) files")
+                                        .font(.caption)
+                                        .foregroundStyle(Color.anjiSecondary)
+                                    Spacer()
+                                    Text("\(Int(mediaProgress.progress * 100))%")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(Color.anjiAccent)
+                                }
+                            }
+                            
+                            // Stats grid
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
+                                MediaStatItem(
+                                    icon: "arrow.down.circle.fill",
+                                    count: mediaProgress.downloaded,
+                                    label: "Downloaded",
+                                    color: .blue
+                                )
+                                MediaStatItem(
+                                    icon: "arrow.up.circle.fill",
+                                    count: mediaProgress.uploaded,
+                                    label: "Uploaded",
+                                    color: .green
+                                )
+                                MediaStatItem(
+                                    icon: "trash.circle.fill",
+                                    count: mediaProgress.removed,
+                                    label: "Removed",
+                                    color: .red
+                                )
+                            }
+                            
+                            // Current file
+                            if !mediaProgress.currentFile.isEmpty {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "doc.fill")
+                                        .font(.caption)
+                                        .foregroundStyle(Color.anjiTertiary)
+                                    Text(mediaProgress.currentFile)
+                                        .font(.caption)
+                                        .lineLimit(1)
+                                        .truncationMode(.middle)
+                                        .foregroundStyle(Color.anjiSecondary)
+                                    Spacer()
+                                }
+                                .padding(8)
+                                .background(Color.anjiBackground)
+                                .cornerRadius(8)
+                            }
+                        } else {
+                            Label("Waiting for collection sync...", systemImage: "hourglass")
+                                .font(.caption)
+                                .foregroundStyle(Color.anjiTertiary)
+                        }
                     }
-                    .frame(height: 80)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.anjiCardBackground)
+                    )
                     .padding(.horizontal)
+                    
+                    // Sync logs card
+                    if !syncLogs.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Image(systemName: "doc.text")
+                                    .foregroundStyle(Color.gray)
+                                Text("Sync Log")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Text("\(syncLogs.count) entries")
+                                    .font(.caption2)
+                                    .foregroundStyle(Color.anjiTertiary)
+                            }
+                            
+                            Divider()
+                            
+                            ScrollView(.vertical, showsIndicators: true) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    ForEach(Array(syncLogs.enumerated()), id: \.offset) { index, log in
+                                        HStack(alignment: .top, spacing: 8) {
+                                            Text("\(index + 1)")
+                                                .font(.caption2)
+                                                .foregroundStyle(Color.anjiTertiary)
+                                                .frame(width: 24, alignment: .leading)
+                                            Text(log)
+                                                .font(.caption)
+                                                .foregroundStyle(Color.anjiSecondary)
+                                                .lineLimit(2)
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(maxHeight: 200)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.anjiCardBackground)
+                        )
+                        .padding(.horizontal)
+                    }
                 }
+                .padding(.vertical)
             }
         case .success(let summary):
             VStack(spacing: Spacing.md) {
@@ -140,6 +274,60 @@ struct SyncSheet: View {
         }
     }
 
+// MARK: - Stat Item Views
+
+private struct StatItem: View {
+    let icon: String
+    let value: String
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+            Text(value)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Color.anjiPrimary)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(Color.anjiSecondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct MediaStatItem: View {
+    let icon: String
+    let count: Int
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+            Text("\(count)")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color.anjiPrimary)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(Color.anjiSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(color.opacity(0.1))
+        )
+    }
+}
+
+// MARK: - Main View Continuation
+
+extension SyncSheet {
     private var fullSyncView: some View {
         VStack(spacing: Spacing.lg) {
             Image(systemName: "arrow.triangle.2.circlepath")
