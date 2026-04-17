@@ -180,7 +180,7 @@ struct CardWebView: UIViewRepresentable {
 
     // MARK: - Coordinator (native audio fallback)
 
-    final class Coordinator: NSObject, WKNavigationDelegate, AVAudioPlayerDelegate {
+    final class Coordinator: NSObject, WKNavigationDelegate {
         private var player: AVAudioPlayer?
         private var queue: [URL] = []
 
@@ -200,7 +200,7 @@ struct CardWebView: UIViewRepresentable {
             queue.removeAll()
         }
 
-        private func playNext() {
+        fileprivate func playNext() {
             guard !queue.isEmpty else { return }
             let url = queue.removeFirst()
             do {
@@ -213,10 +213,12 @@ struct CardWebView: UIViewRepresentable {
                 playNext()
             }
         }
+    }
+}
 
-        func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-            playNext()
-        }
+extension CardWebView.Coordinator: @preconcurrency AVAudioPlayerDelegate {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        playNext()
     }
 }
 
