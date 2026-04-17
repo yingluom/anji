@@ -9,6 +9,7 @@ struct StorageSection: View {
     @State private var collectionSize: Int64 = 0
     @State private var mediaSize: Int64 = 0
     @State private var isLoading = true
+    @State private var showMediaLibrary = false
 
     var body: some View {
         Section {
@@ -32,6 +33,12 @@ struct StorageSection: View {
                         .foregroundStyle(Color.anjiSecondary)
                 }
 
+                Button {
+                    showMediaLibrary = true
+                } label: {
+                    Label("View Media Library", systemImage: "photo.on.rectangle.angled")
+                }
+                
                 Button(role: .destructive) {
                     clearMediaCache()
                 } label: {
@@ -44,6 +51,11 @@ struct StorageSection: View {
             Text("settings.storage.footer")
         }
         .task { await loadSizes() }
+        .sheet(isPresented: $showMediaLibrary) {
+            NavigationStack {
+                MediaLibraryView()
+            }
+        }
     }
 
     private func loadSizes() async {

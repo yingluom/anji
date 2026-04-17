@@ -84,23 +84,35 @@ struct ReviewView: View {
             ratingButton(.good,  color: .anjiGood)
             ratingButton(.easy,  color: .anjiEasy)
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 12)
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private func ratingButton(_ rating: Rating, color: Color) -> some View {
         Button { session.answer(rating: rating) } label: {
-            VStack(spacing: 3) {
+            VStack(spacing: 4) {
                 Text(session.nextIntervals[rating] ?? "")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: 12, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 Text(rating.label)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
+            .padding(.vertical, 14)
+            .padding(.horizontal, 8)
         }
-        .buttonStyle(.bordered)
-        .tint(color)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(color.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .foregroundStyle(color)
+        .buttonStyle(.plain)
     }
 
     // MARK: - Completion
