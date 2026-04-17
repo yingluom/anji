@@ -273,6 +273,7 @@ struct SyncSheet: View {
             fullSyncView
         }
     }
+}
 
 // MARK: - Stat Item Views
 
