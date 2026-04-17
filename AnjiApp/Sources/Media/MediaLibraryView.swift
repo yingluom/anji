@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 /// Media library view showing all synced media files with details.
 struct MediaLibraryView: View {
@@ -95,8 +96,7 @@ struct MediaLibraryView: View {
     }
     
     private func loadMediaFiles() {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let mediaDir = appSupport.appendingPathComponent("AnjiCollection/media", isDirectory: true)
+        let mediaDir = MediaPaths.mediaDirectory
         
         guard let contents = try? FileManager.default.contentsOfDirectory(at: mediaDir, includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey]) else {
             mediaFiles = []
@@ -264,7 +264,7 @@ private struct MediaPreviewSheet: View {
                     AsyncImage(url: file.url) { image in
                         image
                             .resizable()
-                            .scaledToFit
+                            .scaledToFit()
                     } placeholder: {
                         ProgressView()
                     }
@@ -327,8 +327,6 @@ private struct AudioPlayerView: View {
 }
 
 // MARK: - Audio Player
-
-import AVFoundation
 
 private class AudioPlayer: ObservableObject {
     private var player: AVAudioPlayer?
