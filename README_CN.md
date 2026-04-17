@@ -121,35 +121,63 @@ Anji 以未签名 IPA 形式分发。可使用以下任一工具安装：
 
 ### 环境要求
 
-- macOS 系统，安装 Xcode 16+（iOS 18 SDK）
-- Rust 工具链，带 iOS 目标支持
-- Homebrew 包管理器
+- macOS 14+（Sonoma 或更高版本）
+- Xcode 16+（含 iOS 18 SDK）
+- Rust 工具链（stable）
+- Homebrew
 
 ```bash
-# 安装 Rust iOS 目标
+# 安装 Rust（如未安装）
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup target add aarch64-apple-ios aarch64-apple-ios-sim
 
-# 安装必需工具
+# 安装构建工具
 brew install protobuf swift-protobuf xcodegen
 ```
 
-### 构建步骤
+### 一键构建（推荐）
+
+项目提供了完整的本地构建脚本，自动处理依赖检查、Rust 编译、protobuf 生成、Xcode 项目配置、打包和 IPA 输出：
 
 ```bash
-# 1. 克隆（包含子模块）
 git clone --recurse-submodules https://github.com/yingluom/anji.git
 cd anji
 
-# 2. 构建 Rust XCFramework
+# 完整构建：Rust + Swift -> 未签名 IPA
+./scripts/build-local.sh
+
+# 跳过 Rust 编译（复用已有的 XCFramework）
+./scripts/build-local.sh --skip-rust
+
+# 仅构建模拟器版本（快速迭代调试）
+./scripts/build-local.sh --sim
+
+# 清理所有产物后重新构建
+./scripts/build-local.sh --clean
+```
+
+脚本会在开始前检查所有必需工具，缺少时给出安装命令。构建日志保存在 `build/build.log`，失败时自动提取错误信息并显示文件路径和行号。
+
+输出 IPA 位于 `build/AnjiApp-unsigned.ipa`。
+
+### 手动构建
+
+如果你希望逐步执行：
+
+```bash
+git clone --recurse-submodules https://github.com/yingluom/anji.git
+cd anji
+
+# 1. 编译 Rust XCFramework（真机 + 模拟器）
 ./scripts/build-xcframework.sh
 
-# 3. 生成 Swift protobuf 类型
+# 2. 从上游 .proto 文件生成 Swift protobuf 类型
 ./scripts/generate-protos.sh
 
-# 4. 生成 Xcode 项目
+# 3. 从 project.yml 生成 Xcode 项目
 cd AnjiApp && xcodegen generate && cd ..
 
-# 5. 在 Xcode 中打开
+# 4. 在 Xcode 中打开并构建
 open AnjiApp/AnjiApp.xcodeproj
 ```
 

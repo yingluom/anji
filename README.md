@@ -121,35 +121,63 @@ Anji is distributed as an unsigned IPA. You can install it using one of the foll
 
 ### Requirements
 
-- macOS with Xcode 16+ (iOS 18 SDK)
-- Rust toolchain with iOS targets
-- Homebrew packages
+- macOS 14+ (Sonoma or later)
+- Xcode 16+ with iOS 18 SDK
+- Rust toolchain (stable)
+- Homebrew
 
 ```bash
-# Install Rust iOS targets
+# Install Rust (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup target add aarch64-apple-ios aarch64-apple-ios-sim
 
-# Install required tools
+# Install build tools
 brew install protobuf swift-protobuf xcodegen
 ```
 
-### Build Steps
+### Quick Build (Recommended)
+
+A build script is provided that handles the entire pipeline — dependency checks, Rust compilation, protobuf generation, Xcode project setup, archiving, and IPA packaging:
 
 ```bash
-# 1. Clone with submodules
 git clone --recurse-submodules https://github.com/yingluom/anji.git
 cd anji
 
-# 2. Build Rust XCFramework
+# Full build: Rust + Swift -> unsigned IPA
+./scripts/build-local.sh
+
+# Skip Rust compilation (reuse existing XCFramework)
+./scripts/build-local.sh --skip-rust
+
+# Build for simulator only (fast iteration)
+./scripts/build-local.sh --sim
+
+# Clean all artifacts and rebuild from scratch
+./scripts/build-local.sh --clean
+```
+
+The script checks for all prerequisites before starting. If anything is missing, it prints the exact install commands. Build logs are saved to `build/build.log` and errors are displayed with file paths and line numbers.
+
+Output IPA is at `build/AnjiApp-unsigned.ipa`.
+
+### Manual Build Steps
+
+If you prefer to run each step yourself:
+
+```bash
+git clone --recurse-submodules https://github.com/yingluom/anji.git
+cd anji
+
+# 1. Build Rust XCFramework (device + simulator)
 ./scripts/build-xcframework.sh
 
-# 3. Generate Swift protobuf types
+# 2. Generate Swift protobuf types from upstream .proto files
 ./scripts/generate-protos.sh
 
-# 4. Generate Xcode project
+# 3. Generate Xcode project from project.yml
 cd AnjiApp && xcodegen generate && cd ..
 
-# 5. Open in Xcode
+# 4. Open in Xcode and build
 open AnjiApp/AnjiApp.xcodeproj
 ```
 
