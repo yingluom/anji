@@ -82,35 +82,98 @@ workflows:
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
           defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM -bool YES
 
-      - name: Build unsigned IPA
+      - name: Archive with ad-hoc signing
         script: |
           set -euo pipefail
 
-          # Archive directly — xcodebuild resolves SPM deps as part of archive,
-          # so a separate -resolvePackageDependencies step is redundant.
+          # Clean previous build artifacts to avoid stale bundles
+          rm -rf build
+
+          # Use ad-hoc signing ("-") instead of skipping signing entirely.
+          # CODE_SIGNING_ALLOWED=NO causes Xcode 16 to skip resource packaging
+          # and Swift runtime embedding — resulting in a near-empty .app.
+          # Ad-hoc produces a complete bundle with a fake signature that
+          # re-sign tools (SideStore/ESign/Sideloadly/etc.) strip & replace.
           xcodebuild archive \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
+            -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath build/AnjiApp.xcarchive \
             -skipMacroValidation \
             -skipPackagePluginValidation \
-            -parallelizeTargets \
-            -quiet \
             $XCODE_FAST_FLAGS \
-            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGN_STYLE=Manual \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=YES \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES=YES \
+            ENABLE_BITCODE=NO \
+            DEVELOPMENT_TEAM=""
 
-          APP_PATH="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
-          [ -d "$APP_PATH" ] || { echo "ERROR: .app not found in archive at $APP_PATH"; exit 1; }
+      - name: Verify archive contents
+        script: |
+          set -euo pipefail
 
-          # Package unsigned IPA manually — xcodebuild -exportArchive requires signing.
+          APP="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
+          EXE="$APP/AnjiApp"
+
+          [ -d "$APP" ]             || { echo "ERROR: .app missing at $APP"; exit 1; }
+          [ -f "$EXE" ]             || { echo "ERROR: executable missing at $EXE"; exit 1; }
+          [ -f "$APP/Info.plist" ]  || { echo "ERROR: Info.plist missing"; exit 1; }
+
+          # Binary must be a valid arm64 iOS Mach-O
+          echo "=== Binary info ==="
+          file "$EXE"
+          lipo -info "$EXE" || true
+
+          # Non-empty executable check
+          EXE_SIZE=$(stat -f%z "$EXE")
+          echo "Executable size: $EXE_SIZE bytes"
+          [ "$EXE_SIZE" -gt 100000 ] || { echo "ERROR: executable suspiciously small (<100KB)"; exit 1; }
+
+          # Bundle listing
+          echo "=== .app top-level ==="
+          ls -la "$APP"
+          echo "=== Frameworks/ (Swift runtime should be here) ==="
+          ls -la "$APP/Frameworks" 2>/dev/null || echo "(no Frameworks dir — OK on iOS 12.2+)"
+          echo "=== _CodeSignature/ ==="
+          ls -la "$APP/_CodeSignature" 2>/dev/null || echo "(no signature dir)"
+
+          # Total bundle size
+          APP_SIZE_KB=$(du -sk "$APP" | cut -f1)
+          echo "Bundle size: ${APP_SIZE_KB}KB"
+          [ "$APP_SIZE_KB" -gt 500 ] || {
+              echo "ERROR: .app is only ${APP_SIZE_KB}KB — build produced a near-empty bundle"
+              exit 1
+          }
+
+      - name: Package unsigned IPA
+        script: |
+          set -euo pipefail
+
+          APP="build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app"
+
+          # xcodebuild -exportArchive needs a real cert for ad-hoc method,
+          # so we package manually: Payload/AnjiApp.app → zip → .ipa
           mkdir -p build/ipa/Payload
-          cp -R "$APP_PATH" build/ipa/Payload/
-          (cd build/ipa && zip -qry ../AnjiApp-unsigned.ipa Payload)
+          cp -R "$APP" build/ipa/Payload/
+          (cd build/ipa && zip -ry ../AnjiApp-unsigned.ipa Payload)
 
-          echo "==> IPA: $(du -h build/AnjiApp-unsigned.ipa | cut -f1)"
+          IPA=build/AnjiApp-unsigned.ipa
+          IPA_SIZE=$(stat -f%z "$IPA")
+          echo "==> IPA: $IPA ($(du -h "$IPA" | cut -f1), $IPA_SIZE bytes)"
+
+          # Sanity check: any real iOS app IPA is >= several MB
+          [ "$IPA_SIZE" -gt 500000 ] || {
+              echo "ERROR: IPA is only $IPA_SIZE bytes — packaging broken"
+              exit 1
+          }
+
+          # Dump IPA contents for inspection
+          echo "=== IPA contents ==="
+          unzip -l "$IPA" | head -40
 
     artifacts:
       - build/AnjiApp-unsigned.ipa
