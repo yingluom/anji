@@ -1,0 +1,78 @@
+workflows:
+  ios-build:
+    name: Anji iOS — Unsigned IPA
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    environment:
+      vars:
+        XCODE_PROJECT: AnjiApp/AnjiApp.xcodeproj
+        XCODE_SCHEME: AnjiApp
+
+    cache:
+      cache_paths:
+        - $HOME/.cargo/registry
+        - $HOME/.cargo/git
+        - $HOME/.rustup
+
+    scripts:
+      - name: Install Rust toolchain
+        script: |
+          if ! command -v rustup &> /dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+          fi
+          source "$HOME/.cargo/env"
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+          rustup show
+
+      - name: Install build tools
+        script: |
+          brew install protobuf swift-protobuf xcodegen || true
+
+      - name: Checkout git submodules
+        script: |
+          git submodule update --init --recursive
+
+      - name: Build Rust XCFramework
+        script: |
+          source "$HOME/.cargo/env"
+          chmod +x scripts/build-xcframework.sh
+          ./scripts/build-xcframework.sh
+
+      - name: Generate Swift Protobuf types
+        script: |
+          chmod +x scripts/generate-protos.sh
+          ./scripts/generate-protos.sh
+
+      - name: Generate Xcode project
+        script: |
+          cd AnjiApp
+          xcodegen generate
+          cd ..
+
+      - name: Resolve SPM dependencies
+        script: |
+          xcodebuild -resolvePackageDependencies \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME"
+
+      - name: Build unsigned IPA
+        script: |
+          xcodebuild archive \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -destination "generic/platform=iOS" \
+            -archivePath build/AnjiApp.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty
+
+          xcodebuild -exportArchive \
+            -archivePath build/AnjiApp.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist scripts/ExportOptions.plist
+
+    artifacts:
+      - build/ipa/*.ipa
+      - build/AnjiApp.xcarchive/**/*.app

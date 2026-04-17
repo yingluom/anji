@@ -1,0 +1,35 @@
+# === Xcode ===
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.hmap
+*.moved-aside
+*.xcuserstate
+IDEWorkspaceChecks.plist
+
+# === Swift Package Manager ===
+.build/
+.swiftpm/xcode/
+Packages/
+xcuserdata/
+
+# === Rust ===
+anki-bridge-rs/target/
+
+# === Generated Artifacts ===
+AnkiRust.xcframework/
+Sources/AnkiProto/*.pb.swift
+
+# === macOS ===
+.DS_Store
+._*
+
+# === IDE ===
+*.swp
+*~
+.idea/
+.vscode/
