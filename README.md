@@ -63,6 +63,20 @@ Anji provides a complete set of features for effective spaced repetition learnin
 - RTL language support preparation
 - Locale-aware date and number formatting
 
+## Download
+
+Get the latest pre-built IPA from GitHub Releases:
+
+<p align="center">
+  <a href="https://github.com/yingluom/anji/releases/latest">
+    <img src="https://img.shields.io/github/v/release/yingluom/anji?label=Download%20IPA&color=blue&style=for-the-badge" alt="Download Latest Release">
+  </a>
+</p>
+
+- **Latest Release**: https://github.com/yingluom/anji/releases/latest
+- **All Releases**: https://github.com/yingluom/anji/releases
+- **Nightly Builds**: Check [Codemagic](https://codemagic.io) CI artifacts
+
 ## Installation
 
 ### Sideload (Recommended)

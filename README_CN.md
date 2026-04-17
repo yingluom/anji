@@ -63,6 +63,20 @@ Anji 提供完整的间隔重复学习功能：
 - 支持 RTL 语言的准备
 - 本地化的日期和数字格式
 
+## 下载
+
+从 GitHub Releases 获取最新预编译 IPA：
+
+<p align="center">
+  <a href="https://github.com/yingluom/anji/releases/latest">
+    <img src="https://img.shields.io/github/v/release/yingluom/anji?label=下载%20IPA&color=blue&style=for-the-badge" alt="下载最新版本">
+  </a>
+</p>
+
+- **最新版本**：https://github.com/yingluom/anji/releases/latest
+- **所有版本**：https://github.com/yingluom/anji/releases
+- **每日构建**：查看 [Codemagic](https://codemagic.io) CI 产物
+
 ## 安装方法
 
 ### 侧载安装（推荐）
