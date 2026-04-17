@@ -74,7 +74,7 @@ struct SyncSheet: View {
                     .foregroundStyle(Color.anjiSecondary)
                 
                 // Media sync progress
-                if mediaProgress.isActive {
+                if isMediaSyncActive {
                     VStack(spacing: Spacing.sm) {
                         ProgressView(value: Double(mediaProgress.downloaded + mediaProgress.uploaded), 
                                    total: Double(max(mediaProgress.downloaded + mediaProgress.uploaded + 1, 10)))
