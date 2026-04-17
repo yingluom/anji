@@ -24,10 +24,10 @@ if [ -d "$OUTPUT_DIR/anki" ]; then
 fi
 
 # Fix imports for Swift 6.2 InternalImportsByDefault
-echo "==> Patching imports for Swift 6.2..."
+# No extra patches needed for Swift 6.0
 for f in "$OUTPUT_DIR"/*.pb.swift; do
-    sed -i '' 's/^import SwiftProtobuf/public import SwiftProtobuf/' "$f"
-    sed -i '' 's/^import Foundation/public import Foundation/' "$f"
+    # Just ensure Foundation and SwiftProtobuf are imported (standard protoc output)
+    true
 done
 
 COUNT=$(ls "$OUTPUT_DIR"/*.pb.swift 2>/dev/null | wc -l | tr -d ' ')

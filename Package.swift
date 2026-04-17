@@ -1,13 +1,8 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.0
 
 import PackageDescription
 
-let sharedSwiftSettings: [SwiftSetting] = [
-    .enableExperimentalFeature("StrictConcurrency"),
-    .enableUpcomingFeature("ExistentialAny"),
-    .enableUpcomingFeature("InternalImportsByDefault"),
-    .enableUpcomingFeature("MemberImportVisibility"),
-]
+let sharedSwiftSettings: [SwiftSetting] = []
 
 let package = Package(
     name: "AnjiBridge",

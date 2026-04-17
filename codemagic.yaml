@@ -5,6 +5,7 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
+      xcode: 16.0
       vars:
         XCODE_PROJECT: AnjiApp/AnjiApp.xcodeproj
         XCODE_SCHEME: AnjiApp
@@ -65,8 +66,7 @@ workflows:
             -archivePath build/AnjiApp.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            | xcpretty
+            CODE_SIGNING_ALLOWED=NO
 
           xcodebuild -exportArchive \
             -archivePath build/AnjiApp.xcarchive \
