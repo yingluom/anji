@@ -64,7 +64,7 @@ struct SyncSheet: View {
     private var stateView: some View {
         switch state {
         case .idle:
-            ProgressView("Preparing�?)
+            ProgressView("Preparing...")
         case .syncing(let msg):
             ScrollView {
                 VStack(spacing: Spacing.lg) {
@@ -367,14 +367,14 @@ extension SyncSheet {
         syncLogs.removeAll()
         mediaProgress = .init()
 
-        state = .syncing("Syncing collection�?)
+        state = .syncing("Syncing collection...")
         addLog("Connecting to AnkiWeb...")
         
         do {
             let summary = try await syncClient.sync()
             addLog("Collection sync complete")
             
-            state = .syncing("Syncing media�?)
+            state = .syncing("Syncing media...")
             isMediaSyncActive = true
             mediaProgress = AnkiKit.MediaSyncProgress(currentOperation: .checking)
             addLog("Starting media sync...")
@@ -428,7 +428,7 @@ extension SyncSheet {
     }
 
     private func fullSync(_ direction: SyncDirection) async {
-        state = .syncing(direction == .download ? "Downloading�? : "Uploading�?)
+        state = .syncing(direction == .download ? "Downloading..." : "Uploading...")
         do {
             try await syncClient.fullSync(direction)
             state = .success(SyncSummary())

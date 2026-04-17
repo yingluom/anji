@@ -218,7 +218,7 @@ private struct MediaFileRow: View {
                         .font(.caption)
                         .foregroundStyle(Color.anjiSecondary)
                     
-                    Text("�?)
+                    Text("\u00b7")
                         .font(.caption)
                         .foregroundStyle(Color.anjiTertiary)
                     
