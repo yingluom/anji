@@ -44,18 +44,22 @@ if [ -f "$FINGERPRINT_FILE" ] && [ "$(cat "$FINGERPRINT_FILE")" = "$CURRENT_FP" 
     exit 0
 fi
 
-# ---- Build both targets --------------------------------------------------
-echo "==> Building for iOS device (aarch64-apple-ios)..."
-cargo build \
-    --manifest-path "$BRIDGE_DIR/Cargo.toml" \
-    --target aarch64-apple-ios \
-    --release
+# ---- Build both targets in parallel --------------------------------------
+echo "==> Building device + simulator in parallel..."
+(
+    cargo build --manifest-path "$BRIDGE_DIR/Cargo.toml" \
+        --target aarch64-apple-ios --release 2>&1 | sed 's/^/[device] /'
+) &
+DEVICE_PID=$!
+(
+    cargo build --manifest-path "$BRIDGE_DIR/Cargo.toml" \
+        --target aarch64-apple-ios-sim --release 2>&1 | sed 's/^/[sim]    /'
+) &
+SIM_PID=$!
 
-echo "==> Building for iOS simulator (aarch64-apple-ios-sim)..."
-cargo build \
-    --manifest-path "$BRIDGE_DIR/Cargo.toml" \
-    --target aarch64-apple-ios-sim \
-    --release
+# Wait on both; fail if either fails
+wait "$DEVICE_PID" || { echo "ERROR: device build failed"; kill "$SIM_PID" 2>/dev/null || true; exit 1; }
+wait "$SIM_PID"    || { echo "ERROR: simulator build failed"; exit 1; }
 
 DEVICE_LIB="$BRIDGE_DIR/target/aarch64-apple-ios/release/libanki_bridge_ios.a"
 SIM_LIB="$BRIDGE_DIR/target/aarch64-apple-ios-sim/release/libanki_bridge_ios.a"

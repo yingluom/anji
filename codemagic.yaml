@@ -94,21 +94,24 @@ workflows:
           # and Swift runtime embedding — resulting in a near-empty .app.
           # Ad-hoc produces a complete bundle with a fake signature that
           # re-sign tools (SideStore/ESign/Sideloadly/etc.) strip & replace.
+          # -jobs uses all CPU cores; -dwarf skips dSYM for faster archive
+          JOBS=$(sysctl -n hw.ncpu)
           xcodebuild archive \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath build/AnjiApp.xcarchive \
+            -jobs "$JOBS" \
             -skipMacroValidation \
             -skipPackagePluginValidation \
             $XCODE_FAST_FLAGS \
+            DEBUG_INFORMATION_FORMAT=dwarf \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=YES \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
-            ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES=YES \
             ENABLE_BITCODE=NO \
             DEVELOPMENT_TEAM=""
 
