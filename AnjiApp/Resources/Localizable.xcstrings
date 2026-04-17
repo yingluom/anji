@@ -1,0 +1,503 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "common.ok": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "OK" } },
+        "zh-Hans": { "stringUnit": { "value": "确定" } }
+      }
+    },
+    "common.cancel": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Cancel" } },
+        "zh-Hans": { "stringUnit": { "value": "取消" } }
+      }
+    },
+    "common.done": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Done" } },
+        "zh-Hans": { "stringUnit": { "value": "完成" } }
+      }
+    },
+    "tab.decks": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Decks" } },
+        "zh-Hans": { "stringUnit": { "value": "牌组" } }
+      }
+    },
+    "tab.browse": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Browse" } },
+        "zh-Hans": { "stringUnit": { "value": "浏览" } }
+      }
+    },
+    "tab.stats": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Stats" } },
+        "zh-Hans": { "stringUnit": { "value": "统计" } }
+      }
+    },
+    "tab.settings": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Settings" } },
+        "zh-Hans": { "stringUnit": { "value": "设置" } }
+      }
+    },
+    "theme.system": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "System" } },
+        "zh-Hans": { "stringUnit": { "value": "跟随系统" } }
+      }
+    },
+    "theme.light": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Light" } },
+        "zh-Hans": { "stringUnit": { "value": "浅色" } }
+      }
+    },
+    "theme.dark": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Dark" } },
+        "zh-Hans": { "stringUnit": { "value": "深色" } }
+      }
+    },
+    "accent.indigo": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Indigo" } },
+        "zh-Hans": { "stringUnit": { "value": "靛蓝" } }
+      }
+    },
+    "accent.orange": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Orange" } },
+        "zh-Hans": { "stringUnit": { "value": "橙色" } }
+      }
+    },
+    "accent.green": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Green" } },
+        "zh-Hans": { "stringUnit": { "value": "绿色" } }
+      }
+    },
+    "accent.blue": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Blue" } },
+        "zh-Hans": { "stringUnit": { "value": "蓝色" } }
+      }
+    },
+    "accent.purple": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Purple" } },
+        "zh-Hans": { "stringUnit": { "value": "紫色" } }
+      }
+    },
+    "accent.pink": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Pink" } },
+        "zh-Hans": { "stringUnit": { "value": "粉色" } }
+      }
+    },
+    "accent.teal": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Teal" } },
+        "zh-Hans": { "stringUnit": { "value": "青绿" } }
+      }
+    },
+    "lang.system": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "System Default" } },
+        "zh-Hans": { "stringUnit": { "value": "系统默认" } }
+      }
+    },
+    "lang.english": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "English" } },
+        "zh-Hans": { "stringUnit": { "value": "英语" } }
+      }
+    },
+    "lang.chinese_simplified": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Chinese (Simplified)" } },
+        "zh-Hans": { "stringUnit": { "value": "简体中文" } }
+      }
+    },
+    "settings.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Settings" } },
+        "zh-Hans": { "stringUnit": { "value": "设置" } }
+      }
+    },
+    "settings.section.appearance": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Appearance" } },
+        "zh-Hans": { "stringUnit": { "value": "外观" } }
+      }
+    },
+    "settings.language": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Language" } },
+        "zh-Hans": { "stringUnit": { "value": "语言" } }
+      }
+    },
+    "settings.theme": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Theme" } },
+        "zh-Hans": { "stringUnit": { "value": "主题" } }
+      }
+    },
+    "settings.accent_color": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Accent Color" } },
+        "zh-Hans": { "stringUnit": { "value": "强调色" } }
+      }
+    },
+    "settings.accent_color.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Choose a color that appears throughout the app for buttons and highlights." } },
+        "zh-Hans": { "stringUnit": { "value": "选择整个应用中按钮和高亮显示的颜色。" } }
+      }
+    },
+    "settings.relaunch.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Relaunch Required" } },
+        "zh-Hans": { "stringUnit": { "value": "需要重新启动" } }
+      }
+    },
+    "settings.relaunch.message": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Please quit and reopen the app for the language change to take full effect." } },
+        "zh-Hans": { "stringUnit": { "value": "请退出并重新打开应用以使语言更改完全生效。" } }
+      }
+    },
+    "settings.section.sync": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Synchronization" } },
+        "zh-Hans": { "stringUnit": { "value": "同步" } }
+      }
+    },
+    "settings.sync.now": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Sync Now" } },
+        "zh-Hans": { "stringUnit": { "value": "立即同步" } }
+      }
+    },
+    "settings.auto_sync": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Auto Sync" } },
+        "zh-Hans": { "stringUnit": { "value": "自动同步" } }
+      }
+    },
+    "settings.wifi_only": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Wi-Fi Only" } },
+        "zh-Hans": { "stringUnit": { "value": "仅 Wi-Fi" } }
+      }
+    },
+    "settings.media_sync": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Sync Media Files" } },
+        "zh-Hans": { "stringUnit": { "value": "同步媒体文件" } }
+      }
+    },
+    "settings.media_sync.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Download images and audio from AnkiWeb. May use significant data." } },
+        "zh-Hans": { "stringUnit": { "value": "从 AnkiWeb 下载图片和音频。可能会使用大量数据。" } }
+      }
+    },
+    "settings.section.storage": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Storage" } },
+        "zh-Hans": { "stringUnit": { "value": "存储" } }
+      }
+    },
+    "settings.storage.collection": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Collection" } },
+        "zh-Hans": { "stringUnit": { "value": "牌组数据" } }
+      }
+    },
+    "settings.storage.media": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Media" } },
+        "zh-Hans": { "stringUnit": { "value": "媒体" } }
+      }
+    },
+    "settings.storage.clear_media": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Clear Media Cache" } },
+        "zh-Hans": { "stringUnit": { "value": "清理媒体缓存" } }
+      }
+    },
+    "settings.storage.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Clearing media cache will remove downloaded images and audio. They will be re-downloaded on next sync if media sync is enabled." } },
+        "zh-Hans": { "stringUnit": { "value": "清理媒体缓存将删除下载的图片和音频。如果启用了媒体同步，它们将在下次同步时重新下载。" } }
+      }
+    },
+    "settings.section.advanced": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Advanced" } },
+        "zh-Hans": { "stringUnit": { "value": "高级" } }
+      }
+    },
+    "settings.debug.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Debug Tools" } },
+        "zh-Hans": { "stringUnit": { "value": "调试工具" } }
+      }
+    },
+    "settings.section.about": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "About" } },
+        "zh-Hans": { "stringUnit": { "value": "关于" } }
+      }
+    },
+    "settings.about.version": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Version" } },
+        "zh-Hans": { "stringUnit": { "value": "版本" } }
+      }
+    },
+    "settings.about.github": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "GitHub Repository" } },
+        "zh-Hans": { "stringUnit": { "value": "GitHub 仓库" } }
+      }
+    },
+    "settings.about.ankiweb": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "AnkiWeb" } },
+        "zh-Hans": { "stringUnit": { "value": "AnkiWeb" } }
+      }
+    },
+    "settings.about.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Anji is an open-source Anki companion app. It is not affiliated with Ankitects Pty Ltd." } },
+        "zh-Hans": { "stringUnit": { "value": "Anji 是一个开源的 Anki 配套应用。它与 Ankitects Pty Ltd 无关联。" } }
+      }
+    },
+    "stats.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Statistics" } },
+        "zh-Hans": { "stringUnit": { "value": "统计" } }
+      }
+    },
+    "stats.error.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Error Loading Statistics" } },
+        "zh-Hans": { "stringUnit": { "value": "加载统计出错" } }
+      }
+    },
+    "stats.no_data": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "No Data" } },
+        "zh-Hans": { "stringUnit": { "value": "暂无数据" } }
+      }
+    },
+    "stats.today.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Today" } },
+        "zh-Hans": { "stringUnit": { "value": "今日" } }
+      }
+    },
+    "stats.today.studied": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "studied" } },
+        "zh-Hans": { "stringUnit": { "value": "已学习" } }
+      }
+    },
+    "stats.today.time": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "time" } },
+        "zh-Hans": { "stringUnit": { "value": "时间" } }
+      }
+    },
+    "stats.today.accuracy": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "accuracy" } },
+        "zh-Hans": { "stringUnit": { "value": "正确率" } }
+      }
+    },
+    "stats.today.placeholder": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Review some cards today to see your stats." } },
+        "zh-Hans": { "stringUnit": { "value": "今天学习一些卡片以查看统计。" } }
+      }
+    },
+    "stats.forecast.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Forecast" } },
+        "zh-Hans": { "stringUnit": { "value": "预测" } }
+      }
+    },
+    "stats.forecast.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "No upcoming reviews" } },
+        "zh-Hans": { "stringUnit": { "value": "暂无待复习卡片" } }
+      }
+    },
+    "stats.forecast.total": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Total upcoming:" } },
+        "zh-Hans": { "stringUnit": { "value": "待复习总计:" } }
+      }
+    },
+    "stats.reviews.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Review History" } },
+        "zh-Hans": { "stringUnit": { "value": "复习历史" } }
+      }
+    },
+    "stats.reviews.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "No review history yet" } },
+        "zh-Hans": { "stringUnit": { "stringUnit": { "value": "暂无复习历史" } } }
+      }
+    },
+    "stats.legend.learn": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Learn" } },
+        "zh-Hans": { "stringUnit": { "value": "学习" } }
+      }
+    },
+    "stats.legend.review": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Review" } },
+        "zh-Hans": { "stringUnit": { "value": "复习" } }
+      }
+    },
+    "stats.legend.relearn": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Relearn" } },
+        "zh-Hans": { "stringUnit": { "value": "再学习" } }
+      }
+    },
+    "stats.intervals.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Intervals" } },
+        "zh-Hans": { "stringUnit": { "value": "间隔分布" } }
+      }
+    },
+    "stats.intervals.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "No interval data" } },
+        "zh-Hans": { "stringUnit": { "value": "暂无间隔数据" } }
+      }
+    },
+    "stats.intervals.average": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Average interval:" } },
+        "zh-Hans": { "stringUnit": { "value": "平均间隔:" } }
+      }
+    },
+    "stats.ease.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Ease" } },
+        "zh-Hans": { "stringUnit": { "value": "简易度" } }
+      }
+    },
+    "stats.ease.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "No ease data" } },
+        "zh-Hans": { "stringUnit": { "value": "暂无简易度数据" } }
+      }
+    },
+    "stats.ease.average": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Average ease:" } },
+        "zh-Hans": { "stringUnit": { "value": "平均简易度:" } }
+      }
+    },
+    "debug.title": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Debug" } },
+        "zh-Hans": { "stringUnit": { "value": "调试" } }
+      }
+    },
+    "debug.section.app": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "App Info" } },
+        "zh-Hans": { "stringUnit": { "value": "应用信息" } }
+      }
+    },
+    "debug.version": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Version" } },
+        "zh-Hans": { "stringUnit": { "value": "版本" } }
+      }
+    },
+    "debug.build": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Build" } },
+        "zh-Hans": { "stringUnit": { "value": "构建号" } }
+      }
+    },
+    "debug.ios_version": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "iOS" } },
+        "zh-Hans": { "stringUnit": { "value": "iOS 版本" } }
+      }
+    },
+    "debug.device": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Device" } },
+        "zh-Hans": { "stringUnit": { "value": "设备" } }
+      }
+    },
+    "debug.section.paths": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Paths" } },
+        "zh-Hans": { "stringUnit": { "value": "路径" } }
+      }
+    },
+    "debug.collection": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Collection" } },
+        "zh-Hans": { "stringUnit": { "value": "牌组" } }
+      }
+    },
+    "debug.media": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Media" } },
+        "zh-Hans": { "stringUnit": { "value": "媒体" } }
+      }
+    },
+    "debug.section.sync": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Sync" } },
+        "zh-Hans": { "stringUnit": { "value": "同步" } }
+      }
+    },
+    "debug.last_sync": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Last Sync" } },
+        "zh-Hans": { "stringUnit": { "value": "上次同步" } }
+      }
+    },
+    "debug.section.actions": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Actions" } },
+        "zh-Hans": { "stringUnit": { "value": "操作" } }
+      }
+    },
+    "debug.check_db": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Check Database" } },
+        "zh-Hans": { "stringUnit": { "value": "检查数据库" } }
+      }
+    },
+    "debug.optimize_db": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Optimize Database" } },
+        "zh-Hans": { "stringUnit": { "value": "优化数据库" } }
+      }
+    },
+    "debug.clear_cache": {
+      "localizations": {
+        "en": { "stringUnit": { "value": "Clear URL Cache" } },
+        "zh-Hans": { "stringUnit": { "value": "清理 URL 缓存" } }
+      }
+    }
+  }
+}

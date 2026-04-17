@@ -20,6 +20,8 @@ targets:
     sources:
       - path: Sources
         type: group
+      - path: Resources
+        type: group
     dependencies:
       - package: AnjiBridge
         product: AnkiKit

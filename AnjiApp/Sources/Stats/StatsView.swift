@@ -2,43 +2,42 @@ import SwiftUI
 import AnkiClients
 import Dependencies
 
+/// Statistics dashboard with Anki desktop-aligned charts.
 struct StatsView: View {
-    @Dependency(\.statsClient) var statsClient
-    @State private var graphData: Data?
-    @State private var isLoading = true
+    @State private var viewModel = StatsViewModel()
 
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.lg) {
-                if isLoading {
+                if viewModel.isLoading {
                     ProgressView()
                         .frame(maxHeight: 200)
+                } else if let error = viewModel.errorMessage {
+                    ContentUnavailableView(
+                        "stats.error.title",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text(error)
+                    )
                 } else {
-                    // Summary card
-                    VStack(spacing: Spacing.md) {
-                        Text("Statistics")
-                            .anjiFont(.title)
-                            .foregroundStyle(Color.anjiPrimary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Text("Review data is powered by the Anki engine.")
-                            .anjiFont(.callout)
-                            .foregroundStyle(Color.anjiSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        if graphData != nil {
-                            Text("Graph data loaded successfully. Detailed charts coming soon.")
-                                .anjiFont(.body)
-                                .foregroundStyle(Color.anjiTeal)
-                                .padding()
-                                .anjiCard()
-                        } else {
-                            ContentUnavailableView(
-                                "No Data",
-                                systemImage: "chart.bar",
-                                description: Text("Review some cards to see your statistics.")
-                            )
+                    // Range picker
+                    Picker("", selection: $viewModel.selectedRange) {
+                        ForEach(StatsViewModel.StatsRange.allCases, id: \.self) { range in
+                            Text(range.rawValue).tag(range)
                         }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+                    .onChange(of: viewModel.selectedRange) { _, _ in
+                        Task { await viewModel.load() }
+                    }
+
+                    // Chart cards
+                    VStack(spacing: Spacing.md) {
+                        TodayCard(stats: viewModel.today)
+                        ForecastCard(data: viewModel.forecast)
+                        ReviewsCard(data: viewModel.reviews)
+                        IntervalsCard(data: viewModel.intervals)
+                        EaseCard(data: viewModel.eases)
                     }
                     .padding(.horizontal)
                 }
@@ -46,13 +45,8 @@ struct StatsView: View {
             .padding(.top)
         }
         .background(Color.anjiBackground)
-        .navigationTitle("Stats")
-        .task { await loadStats() }
-    }
-
-    private func loadStats() async {
-        isLoading = true
-        graphData = try? statsClient.fetchGraphs("deck:*", 365)
-        isLoading = false
+        .navigationTitle("stats.title")
+        .task { await viewModel.load() }
+        .refreshable { await viewModel.load() }
     }
 }

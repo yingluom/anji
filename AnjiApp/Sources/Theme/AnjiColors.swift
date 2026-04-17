@@ -1,7 +1,14 @@
 import SwiftUI
 
 // MARK: - Anji Design System — Colors
-// A distinctive deep indigo + warm teal palette.
+// Neutrals are fixed; accent is driven by the user's AccentPreset choice and
+// must be applied at the view layer via `.environment(\.anjiAccent, …)` or
+// by reading `AccentPreset.current.color` from an `@Shared(.accentPreset)`.
+//
+// For simplicity, `Color.anjiAccent` remains the legacy deep-indigo default so
+// that any code not yet migrated keeps working. The root view tree passes the
+// preferred accent down via `.tint(...)` which is what SwiftUI uses for
+// interactive elements.
 
 extension Color {
     // Backgrounds
@@ -14,9 +21,9 @@ extension Color {
     static let anjiSecondary  = Color(light: .black.opacity(0.65), dark: .white.opacity(0.72))
     static let anjiTertiary   = Color(light: .black.opacity(0.38), dark: .white.opacity(0.42))
 
-    // Accent — deep indigo
-    static let anjiAccent     = Color(light: Color(hex: 0x4F46E5), dark: Color(hex: 0x818CF8))
-    // Teal for secondary actions
+    // Legacy accent (used as fallback when no AccentPreset env is available).
+    static let anjiAccent     = AccentPreset.indigo.color
+    // Teal for secondary actions (kept stable regardless of accent)
     static let anjiTeal       = Color(light: Color(hex: 0x0D9488), dark: Color(hex: 0x2DD4BF))
 
     // Semantic

@@ -7,9 +7,15 @@ import Sharing
 @main
 struct AnjiApp: App {
     @Shared(.onboardingDone) private var onboardingDone
+    @Shared(.preferredLanguage) private var preferredLanguage
+    @Shared(.appTheme) private var appTheme
+    @Shared(.accentPreset) private var accentPreset
+
     @State private var pendingReviewDeckId: Int64? = nil
 
     init() {
+        // Apply language preference immediately (requires relaunch to fully take effect).
+        LanguageManager.apply(preferredLanguage)
         try! prepareDependencies {
             let backend = try AnkiBackend(preferredLanguages: ["en"])
 
@@ -45,6 +51,9 @@ struct AnjiApp: App {
                     WelcomeView()
                 }
             }
+            .preferredColorScheme(appTheme.colorScheme)
+            .tint(accentPreset.color)
+            .environment(\.locale, LanguageManager.effectiveLocale(for: preferredLanguage))
             .onOpenURL { url in
                 guard url.scheme == "anji", url.host == "review",
                       let deckIdStr = URLComponents(url: url, resolvingAgainstBaseURL: false)?

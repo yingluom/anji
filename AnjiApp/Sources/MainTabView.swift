@@ -3,7 +3,7 @@ import AnkiSync
 import AnkiClients
 import Sharing
 
-/// The main tab view — Decks, Browse, Stats.
+/// The main tab view — Decks, Browse, Stats, Settings.
 struct MainTabView: View {
     @Binding var pendingReviewDeckId: Int64?
     @State private var showSync = false
@@ -11,7 +11,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            Tab("Decks", systemImage: "rectangle.stack.fill") {
+            Tab("tab.decks", systemImage: "rectangle.stack.fill") {
                 NavigationStack {
                     DeckListView()
                         .id(refreshToken)
@@ -30,12 +30,20 @@ struct MainTabView: View {
                     BrowseView()
                         .id(refreshToken)
                 }
+            } label: {
+                Label("tab.browse", systemImage: "magnifyingglass")
             }
 
-            Tab("Stats", systemImage: "chart.bar.fill") {
+            Tab("tab.stats", systemImage: "chart.bar.fill") {
                 NavigationStack {
                     StatsView()
                         .id(refreshToken)
+                }
+            }
+
+            Tab("tab.settings", systemImage: "gearshape.fill") {
+                NavigationStack {
+                    SettingsView()
                 }
             }
         }
