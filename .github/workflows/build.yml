@@ -24,7 +24,7 @@ jobs:
           restore-keys: spm-${{ runner.os }}-
 
       - name: Setup Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-action@v1
         with:
           targets: aarch64-apple-ios, aarch64-apple-ios-sim
 
