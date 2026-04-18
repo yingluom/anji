@@ -18,6 +18,23 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Cache SPM dependencies
+        uses: actions/cache@v3
+        with:
+          path: build/spm_cache
+          key: spm-${{ runner.os }}-${{ hashFiles('AnjiApp/AnjiApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Cache Rust build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            build/rust_build
+          key: rust-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: rust-${{ runner.os }}-
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -25,10 +42,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install protobuf swift-protobuf xcodegen
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install protobuf swift-protobuf xcodegen 2>/dev/null || true
 
       - name: Build XCFramework
-        run: bash scripts/build-xcframework.sh
+        run: |
+          # Cache XCFramework if already built
+          if [ -f "build/AnkiBackend.xcframework/Info.plist" ]; then
+            echo "XCFramework found in cache, skipping build"
+          else
+            bash scripts/build-xcframework.sh
+          fi
 
       - name: Generate Protobuf & Xcode Project
         run: |
@@ -47,8 +71,11 @@ jobs:
             -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath build/AnjiApp.xcarchive \
+            -clonedSourcePackagesDirPath build/spm_cache \
             -skipMacroValidation \
             -skipPackagePluginValidation \
+            -parallelizeTargets \
+            COMPILER_INDEX_STORE_ENABLE=NO \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGNING_REQUIRED=NO \
