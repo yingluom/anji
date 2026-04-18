@@ -96,51 +96,71 @@ struct MediaLibraryView: View {
     }
     
     private func loadMediaFiles() {
-        let mediaDir = MediaPaths.mediaDirectory
-        
-        guard let contents = try? FileManager.default.contentsOfDirectory(at: mediaDir, includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey]) else {
-            mediaFiles = []
-            isLoading = false
-            return
-        }
-        
-        var files: [MediaFile] = []
-        var total: Int64 = 0
-        
-        for url in contents {
-            guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
-                  let size = attributes[.size] as? Int64,
-                  let date = attributes[.modificationDate] as? Date else {
-                continue
+        // Use background task to avoid blocking UI with large media libraries
+        Task.detached(priority: .userInitiated) {
+            let mediaDir = MediaPaths.mediaDirectory
+
+            guard let contents = try? FileManager.default.contentsOfDirectory(
+                at: mediaDir,
+                includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey]
+            ) else {
+                await MainActor.run {
+                    mediaFiles = []
+                    isLoading = false
+                }
+                return
             }
-            
-            total += size
-            
-            let ext = url.pathExtension.lowercased()
-            let type: MediaFile.MediaType
-            switch ext {
-            case "mp3", "wav", "m4a", "ogg", "aac", "flac":
-                type = .audio
-            case "jpg", "jpeg", "png", "gif", "webp", "svg", "bmp":
-                type = .image
-            case "mp4", "mov", "avi", "mkv", "webm":
-                type = .video
-            default:
-                type = .other
+
+            var files: [MediaFile] = []
+            var total: Int64 = 0
+
+            // Process files in batches to allow UI updates
+            let batchSize = 100
+            for (index, url) in contents.enumerated() {
+                guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+                      let size = attributes[.size] as? Int64,
+                      let date = attributes[.modificationDate] as? Date else {
+                    continue
+                }
+
+                total += size
+
+                let ext = url.pathExtension.lowercased()
+                let type: MediaFile.MediaType
+                switch ext {
+                case "mp3", "wav", "m4a", "ogg", "aac", "flac":
+                    type = .audio
+                case "jpg", "jpeg", "png", "gif", "webp", "svg", "bmp":
+                    type = .image
+                case "mp4", "mov", "avi", "mkv", "webm":
+                    type = .video
+                default:
+                    type = .other
+                }
+
+                files.append(MediaFile(
+                    name: url.lastPathComponent,
+                    size: size,
+                    modifiedDate: date,
+                    url: url,
+                    type: type
+                ))
+
+                // Yield to main thread periodically for large libraries
+                if index % batchSize == 0 && index > 0 {
+                    await Task.yield()
+                }
             }
-            
-            files.append(MediaFile(
-                name: url.lastPathComponent,
-                size: size,
-                modifiedDate: date,
-                url: url,
-                type: type
-            ))
+
+            // Sort and update UI on main thread
+            let sortedFiles = files.sorted { $0.modifiedDate > $1.modifiedDate }
+
+            await MainActor.run {
+                mediaFiles = sortedFiles
+                totalSize = total
+                isLoading = false
+            }
         }
-        
-        mediaFiles = files.sorted { $0.modifiedDate > $1.modifiedDate }
-        totalSize = total
-        isLoading = false
     }
     
     private func formatBytes(_ bytes: Int64) -> String {

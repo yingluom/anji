@@ -10,6 +10,8 @@ struct StorageSection: View {
     @State private var mediaSize: Int64 = 0
     @State private var isLoading = true
     @State private var showMediaLibrary = false
+    @State private var showClearConfirm = false
+    @State private var showClearSuccess = false
 
     var body: some View {
         Section {
@@ -40,9 +42,21 @@ struct StorageSection: View {
                 }
                 
                 Button(role: .destructive) {
-                    clearMediaCache()
+                    showClearConfirm = true
                 } label: {
                     Label("settings.storage.clear_media", systemImage: "trash")
+                }
+                .confirmationDialog(
+                    "Clear Media Cache?",
+                    isPresented: $showClearConfirm,
+                    titleVisibility: .visible
+                ) {
+                    Button("Clear Cache", role: .destructive) {
+                        clearMediaCache()
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This will delete all downloaded media files (\(ByteCountFormatter.string(fromByteCount: mediaSize, countStyle: .file))). They will be re-downloaded on next sync.")
                 }
             }
         } header: {
@@ -51,6 +65,11 @@ struct StorageSection: View {
             Text("settings.storage.footer")
         }
         .task { await loadSizes() }
+        .alert("Media Cache Cleared", isPresented: $showClearSuccess) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Media files have been deleted. They will be re-downloaded on your next sync.")
+        }
         .sheet(isPresented: $showMediaLibrary) {
             NavigationStack {
                 MediaLibraryView()
@@ -90,6 +109,9 @@ struct StorageSection: View {
         let mediaPath = appSupport.appendingPathComponent("AnjiCollection/media").path
         try? FileManager.default.removeItem(atPath: mediaPath)
         try? FileManager.default.createDirectory(atPath: mediaPath, withIntermediateDirectories: true)
-        Task { await loadSizes() }
+        Task {
+            await loadSizes()
+            showClearSuccess = true
+        }
     }
 }
