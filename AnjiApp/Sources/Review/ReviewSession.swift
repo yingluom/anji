@@ -4,6 +4,32 @@ import AnkiServices
 import Dependencies
 import Foundation
 
+/// The type of card being reviewed, for UI display purposes.
+enum CardQueueType: String, CaseIterable {
+    case new = "new"
+    case learning = "learning"
+    case review = "review"
+    case unknown = "unknown"
+
+    var label: String {
+        switch self {
+        case .new: return String(localized: "card.type.new")
+        case .learning: return String(localized: "card.type.learning")
+        case .review: return String(localized: "card.type.review")
+        case .unknown: return ""
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .new: return .anjiNew
+        case .learning: return .anjiLearn
+        case .review: return .anjiReview
+        case .unknown: return .gray
+        }
+    }
+}
+
 @Observable @MainActor
 final class ReviewSession {
     let deckId: Int64
@@ -21,6 +47,18 @@ final class ReviewSession {
     private(set) var isFinished = false
     private(set) var canUndo = false
     private(set) var nextIntervals: [Rating: String] = [:]
+
+    /// Current card type: new (blue), learning (red), or review (green)
+    var currentCardType: CardQueueType {
+        guard let card = currentCard?.card else { return .unknown }
+        // queue: 0=new, 1=learning, 2=review
+        switch card.queue {
+        case 0: return .new
+        case 1: return .learning
+        case 2: return .review
+        default: return .unknown
+        }
+    }
 
     private var cardQueue: [QueuedReviewCard] = []
     private var currentCard: QueuedReviewCard?

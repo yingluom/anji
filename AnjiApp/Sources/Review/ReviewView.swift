@@ -54,6 +54,29 @@ struct ReviewView: View {
 
     private var cardArea: some View {
         VStack(spacing: 0) {
+            // Card type indicator
+            HStack {
+                Spacer()
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(session.currentCardType.color)
+                        .frame(width: 8, height: 8)
+                    Text(session.currentCardType.label)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundStyle(session.currentCardType.color)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(session.currentCardType.color.opacity(0.12))
+                )
+                Spacer()
+            }
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+
             CardWebView(html: session.showingAnswer ? session.answerHTML : session.questionHTML)
                 .frame(maxHeight: .infinity)
 

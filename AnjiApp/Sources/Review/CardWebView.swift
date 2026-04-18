@@ -40,8 +40,9 @@ struct CardWebView: UIViewRepresentable {
         webView.scrollView.bounces = false
         webView.navigationDelegate = context.coordinator
 
-        // Ensure audio plays even when device is on silent switch.
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+        // Configure audio to use media volume (not ringer) and respect silent switch.
+        // Ambient mode allows audio to mix with other apps and uses media volume buttons.
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
         return webView
     }

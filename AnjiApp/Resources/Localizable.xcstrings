@@ -541,6 +541,24 @@
         "en": { "stringUnit": { "state": "translated", "value": "Failed to load quote. Tap to retry." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "加载失败，点击重试" } }
       }
+    },
+    "card.type.new": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "New" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "新卡片" } }
+      }
+    },
+    "card.type.learning": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Learning" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "学习中" } }
+      }
+    },
+    "card.type.review": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Review" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "复习" } }
+      }
     }
   }
 }
