@@ -1,0 +1,82 @@
+name: Build IPA (optimized)
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v3
+        with:
+          path: build/spm_cache
+          key: spm-${{ runner.os }}-${{ hashFiles('AnjiApp/AnjiApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          targets: aarch64-apple-ios, aarch64-apple-ios-sim
+
+      - name: Install dependencies
+        run: |
+          brew install protobuf swift-protobuf xcodegen
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+
+      - name: Build XCFramework
+        run: bash scripts/build-xcframework.sh
+
+      - name: Generate Protobuf & Xcode Project
+        run: |
+          bash scripts/generate-protos.sh
+          cd AnjiApp && xcodegen generate && cd ..
+
+      - name: Build Archive (optimized)
+        run: |
+          xcodebuild archive \
+            -project AnjiApp/AnjiApp.xcodeproj \
+            -scheme AnjiApp \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath build/AnjiApp.xcarchive \
+            -clonedSourcePackagesDirPath build/spm_cache \
+            -skipMacroValidation \
+            -skipPackagePluginValidation \
+            -parallelizeTargets \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGNING_REQUIRED=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            ENABLE_BITCODE=NO \
+            2>&1 | tee build/xcodebuild.log
+
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "Build failed! Errors:"
+            grep -n "error:" build/xcodebuild.log | head -30
+            exit 1
+          fi
+
+      - name: Package IPA
+        run: |
+          mkdir -p build/ipa/Payload
+          cp -R "build/AnjiApp.xcarchive/Products/Applications/AnjiApp.app" build/ipa/Payload/
+          cd build/ipa && zip -ry ../AnjiApp-unsigned.ipa Payload && cd ../..
+          ls -lh build/AnjiApp-unsigned.ipa
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnjiApp-unsigned
+          path: build/AnjiApp-unsigned.ipa
+          retention-days: 7
