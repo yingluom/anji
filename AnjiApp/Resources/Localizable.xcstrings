@@ -655,6 +655,132 @@
         "en": { "stringUnit": { "state": "translated", "value": "Shows study progress on Dynamic Island and Lock Screen when you leave the app. Tap the version number 8 times in About to access debug tools." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "退出应用时在灵动岛和锁定屏幕显示学习进度。在关于页面连点版本号8次可进入调试工具。" } }
       }
+    },
+    "stats.hourly.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Hourly Distribution" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "每小时分布" } }
+      }
+    },
+    "stats.hourly.peak": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Peak:" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "高峰:" } }
+      }
+    },
+    "stats.hourly.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No hourly data available" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无每小时数据" } }
+      }
+    },
+    "stats.hourly.morning": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Morning" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "上午" } }
+      }
+    },
+    "stats.hourly.afternoon": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Afternoon" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "下午" } }
+      }
+    },
+    "stats.hourly.evening": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Evening" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "晚上" } }
+      }
+    },
+    "stats.stability.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Stability Distribution" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "稳定性分布" } }
+      }
+    },
+    "stats.stability.median": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Median:" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "中位数:" } }
+      }
+    },
+    "stats.stability.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No stability data available (FSRS required)" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无稳定性数据 (需要FSRS)" } }
+      }
+    },
+    "stats.stability.short": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Short" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "短期" } }
+      }
+    },
+    "stats.stability.medium": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Medium" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "中期" } }
+      }
+    },
+    "stats.stability.long": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Long" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "长期" } }
+      }
+    },
+    "stats.difficulty.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Card Difficulty" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "卡片难度" } }
+      }
+    },
+    "stats.difficulty.avg": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Avg:" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "平均:" } }
+      }
+    },
+    "stats.difficulty.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No difficulty data available (FSRS required)" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无难度数据 (需要FSRS)" } }
+      }
+    },
+    "stats.retention.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "True Retention" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "真实保留率" } }
+      }
+    },
+    "stats.retention.young": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Young" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "年轻卡" } }
+      }
+    },
+    "stats.retention.mature": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Mature" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "成熟卡" } }
+      }
+    },
+    "stats.retention.passed": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Passed" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "通过" } }
+      }
+    },
+    "stats.retention.failed": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Failed" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "失败" } }
+      }
+    },
+    "stats.retention.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No retention data available" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无保留率数据" } }
+      }
     }
   }
 }

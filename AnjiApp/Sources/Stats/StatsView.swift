@@ -35,6 +35,10 @@ struct StatsView: View {
                     VStack(spacing: Spacing.md) {
                         TodayCard(stats: viewModel.today)
                         CardCountsCard(counts: viewModel.cardCounts)
+                        RetentionCard(stats: viewModel.trueRetention)
+                        HourlyCard(data: viewModel.hourlyData)
+                        StabilityCard(data: viewModel.stabilityData)
+                        DifficultyCard(data: viewModel.difficultyData)
                         ForecastCard(data: viewModel.forecast)
                         ReviewsCard(data: viewModel.reviews)
                         IntervalsCard(data: viewModel.intervals)

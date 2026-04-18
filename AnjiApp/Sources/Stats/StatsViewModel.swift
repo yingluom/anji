@@ -21,6 +21,13 @@ final class StatsViewModel {
     var reviews: [ReviewPoint] = []
     var intervals: [IntervalPoint] = []
     var eases: [EasePoint] = []
+    
+    // New stats
+    var hourlyData: [HourlyPoint] = []
+    var stabilityData: [StabilityPoint] = []
+    var difficultyData: [DifficultyPoint] = []
+    var retrievabilityData: [RetrievabilityPoint] = []
+    var trueRetention: TrueRetentionStats?
 
     var selectedRange: StatsRange = .oneMonth
 
@@ -111,6 +118,63 @@ final class StatsViewModel {
         eases = response.eases.eases.sorted { $0.key < $1.key }.map {
             EasePoint(easePercent: Double($0.key) / 10.0, count: Int($0.value))
         }
+        
+        // Hourly distribution (use selected range)
+        if response.hasHours {
+            let hoursData: [Anki_Stats_GraphsResponse.Hours.Hour]
+            switch selectedRange {
+            case .oneMonth: hoursData = Array(response.hours.oneMonth)
+            case .threeMonths: hoursData = Array(response.hours.threeMonths)
+            case .oneYear: hoursData = Array(response.hours.oneYear)
+            case .allTime: hoursData = Array(response.hours.allTime)
+            }
+            hourlyData = hoursData.enumerated().map { hour, data in
+                HourlyPoint(hour: hour, total: Int(data.total), correct: Int(data.correct))
+            }
+        }
+        
+        // Stability distribution (FSRS only)
+        if response.hasStability {
+            stabilityData = response.stability.intervals.sorted { $0.key < $1.key }.map {
+                StabilityPoint(stabilityDays: Int($0.key), count: Int($0.value))
+            }
+        }
+        
+        // Difficulty distribution (FSRS only)
+        if response.hasDifficulty {
+            difficultyData = response.difficulty.eases.sorted { $0.key < $1.key }.map {
+                DifficultyPoint(difficulty: Double($0.key) / 10.0, count: Int($0.value))
+            }
+        }
+        
+        // Retrievability (memory retention) - FSRS only
+        if response.hasRetrievability {
+            retrievabilityData = response.retrievability.retrievability.sorted { $0.key < $1.key }.map {
+                RetrievabilityPoint(retrievabilityPercent: Double($0.key) / 10.0, count: Int($0.value))
+            }
+        }
+        
+        // True retention stats
+        if response.hasTrueRetention {
+            let tr = response.trueRetention
+            trueRetention = TrueRetentionStats(
+                today: parseRetention(tr.today),
+                yesterday: parseRetention(tr.yesterday),
+                week: parseRetention(tr.week),
+                month: parseRetention(tr.month),
+                year: parseRetention(tr.year),
+                allTime: parseRetention(tr.allTime)
+            )
+        }
+    }
+    
+    private func parseRetention(_ retention: Anki_Stats_GraphsResponse.TrueRetentionStats.TrueRetention) -> TrueRetention {
+        TrueRetention(
+            youngPassed: Int(retention.youngPassed),
+            youngFailed: Int(retention.youngFailed),
+            maturePassed: Int(retention.maturePassed),
+            matureFailed: Int(retention.matureFailed)
+        )
     }
 }
 
@@ -173,4 +237,53 @@ struct EasePoint: Identifiable {
     let id = UUID()
     let easePercent: Double // 130.0 = 130%
     let count: Int
+}
+
+// MARK: - New Stats Data Models
+
+struct HourlyPoint: Identifiable {
+    let id = UUID()
+    let hour: Int // 0-23
+    let total: Int
+    let correct: Int
+    var accuracy: Double { total > 0 ? Double(correct) / Double(total) : 0 }
+}
+
+struct StabilityPoint: Identifiable {
+    let id = UUID()
+    let stabilityDays: Int
+    let count: Int
+}
+
+struct DifficultyPoint: Identifiable {
+    let id = UUID()
+    let difficulty: Double // 0-100%
+    let count: Int
+}
+
+struct RetrievabilityPoint: Identifiable {
+    let id = UUID()
+    let retrievabilityPercent: Double // 0-100%
+    let count: Int
+}
+
+struct TrueRetention {
+    let youngPassed: Int
+    let youngFailed: Int
+    let maturePassed: Int
+    let matureFailed: Int
+    
+    var youngTotal: Int { youngPassed + youngFailed }
+    var matureTotal: Int { maturePassed + matureFailed }
+    var youngRate: Double { youngTotal > 0 ? Double(youngPassed) / Double(youngTotal) : 0 }
+    var matureRate: Double { matureTotal > 0 ? Double(maturePassed) / Double(matureTotal) : 0 }
+}
+
+struct TrueRetentionStats {
+    let today: TrueRetention
+    let yesterday: TrueRetention
+    let week: TrueRetention
+    let month: TrueRetention
+    let year: TrueRetention
+    let allTime: TrueRetention
 }
