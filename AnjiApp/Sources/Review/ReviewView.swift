@@ -148,8 +148,7 @@ struct ReviewView: View {
                     html: session.showingAnswer ? session.answerHTML : session.questionHTML,
                     templateCSS: session.templateCSS
                 )
-                .frame(maxWidth: .infinity, minHeight: UIScreen.main.bounds.height * 0.5)
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
@@ -161,20 +160,60 @@ struct ReviewView: View {
                     Button {
                         withAnimation(.easeOut(duration: 0.2)) { session.revealAnswer() }
                     } label: {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 8) {
                             Image(systemName: "eye.fill")
-                                .font(.system(size: 14, weight: .semibold))
+                                .font(.system(size: 16, weight: .semibold))
                             Text("review.show_answer")
-                                .font(.system(size: 15, weight: .semibold))
+                                .font(.system(size: 16, weight: .semibold))
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, 32)
+                        .padding(.vertical, 14)
                     }
                     .background(
-                        Capsule()
-                            .fill(anjiAccent)
+                        ZStack {
+                            // Base glass layer
+                            Capsule()
+                                .fill(.ultraThinMaterial)
+                            
+                            // Gradient overlay
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            anjiAccent.opacity(0.25),
+                                            anjiAccent.opacity(0.1)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                            
+                            // Inner highlight
+                            Capsule()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [
+                                            .white.opacity(0.5),
+                                            .white.opacity(0.2)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 1
+                                )
+                            
+                            // Outer border
+                            Capsule()
+                                .stroke(anjiAccent.opacity(0.4), lineWidth: 1.5)
+                        }
+                        .shadow(
+                            color: anjiAccent.opacity(0.25),
+                            radius: 8,
+                            x: 0,
+                            y: 4
+                        )
                     )
-                    .foregroundStyle(.white)
+                    .foregroundStyle(anjiAccent)
                     .buttonStyle(.plain)
                     Spacer()
                 }
@@ -211,35 +250,65 @@ struct ReviewView: View {
                     action()
                 }
             } label: {
-                VStack(spacing: 4) {
+                VStack(spacing: 2) {
                     Text(interval)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                        .minimumScaleFactor(0.7)
                     Text(rating.label)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .padding(.horizontal, 8)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 4)
             }
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(color.opacity(isPressed ? 0.6 : 0.3), lineWidth: isPressed ? 2 : 1)
-                    )
-                    .shadow(
-                        color: color.opacity(isPressed ? 0.2 : 0),
-                        radius: isPressed ? 8 : 0,
-                        x: 0,
-                        y: isPressed ? 4 : 0
-                    )
+                ZStack {
+                    // Base glass layer
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.ultraThinMaterial)
+                    
+                    // Gradient overlay for depth
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    color.opacity(0.15),
+                                    color.opacity(0.05)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    
+                    // Inner highlight
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    .white.opacity(0.4),
+                                    .white.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1
+                        )
+                    
+                    // Outer border with color
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(color.opacity(isPressed ? 0.5 : 0.25), lineWidth: isPressed ? 2 : 1)
+                }
+                .shadow(
+                    color: color.opacity(isPressed ? 0.3 : 0.15),
+                    radius: isPressed ? 12 : 6,
+                    x: 0,
+                    y: isPressed ? 6 : 2
+                )
             )
             .foregroundStyle(color)
-            .scaleEffect(isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.15), value: isPressed)
+            .scaleEffect(isPressed ? 0.92 : 1.0)
+            .animation(.easeInOut(duration: 0.12), value: isPressed)
             .buttonStyle(RatingButtonStyle(isPressed: $isPressed))
         }
     }

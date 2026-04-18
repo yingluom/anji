@@ -119,9 +119,9 @@ struct CardWebView: UIViewRepresentable {
             body {
                 /* Default iOS system fonts, but card CSS can override via .card class */
                 font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 18px;
-                line-height: 1.6;
-                padding: 16px;
+                font-size: 20px;
+                line-height: 1.7;
+                padding: 20px;
                 color: #1a1a2e;
                 word-wrap: break-word;
                 -webkit-text-size-adjust: 100%;
@@ -316,10 +316,14 @@ struct CardWebView: UIViewRepresentable {
             body {
                 display: flex;
                 flex-direction: column;
+                justify-content: center; /* Center content vertically */
             }
             .card {
                 flex: 1;
                 min-height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center; /* Center card content vertically */
             }
 
             /* Link styling for better visibility and touch */
