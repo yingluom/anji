@@ -8,6 +8,8 @@ struct DeckListView: View {
     @State private var tree: [DeckTreeNode] = []
     @State private var isLoading = true
     @State private var showCreateSheet = false
+    @State private var reviewDeckId: Int64? = nil
+    @State private var showDeckDetail: DeckInfo? = nil
 
     var body: some View {
         Group {
@@ -27,17 +29,30 @@ struct DeckListView: View {
                             .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
                             .listRowBackground(Color.clear)
                     }
-                    
+
                     ForEach(tree) { node in
-                        DeckRowView(node: node) { await loadDecks() }
+                        DeckRowView(
+                            node: node,
+                            onMutated: { await loadDecks() },
+                            onStartReview: { deckId in reviewDeckId = deckId },
+                            onShowDetail: { deck in showDeckDetail = deck }
+                        )
                     }
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
                 .background(Color.anjiBackground)
-                .navigationDestination(for: DeckInfo.self) { deck in
-                    DeckDetailView(deck: deck)
-                }
+            }
+        }
+        .fullScreenCover(item: $reviewDeckId) { deckId in
+            ReviewView(deckId: deckId) {
+                reviewDeckId = nil
+                Task { await loadDecks() }
+            }
+        }
+        .sheet(item: $showDeckDetail) { deck in
+            NavigationStack {
+                DeckDetailView(deck: deck)
             }
         }
         .navigationTitle("Decks")
@@ -73,10 +88,16 @@ struct DeckListView: View {
 private struct DeckRowView: View {
     let node: DeckTreeNode
     let onMutated: () async -> Void
+    let onStartReview: (Int64) -> Void
+    let onShowDetail: (DeckInfo) -> Void
 
     @Dependency(\.deckClient) var deckClient
     @State private var showRename = false
     @State private var showDelete = false
+
+    private var hasCardsToReview: Bool {
+        node.counts.newCount > 0 || node.counts.learnCount > 0 || node.counts.reviewCount > 0
+    }
 
     var body: some View {
         rowContent
@@ -107,15 +128,40 @@ private struct DeckRowView: View {
     @ViewBuilder
     private var rowContent: some View {
         if node.children.isEmpty {
-            NavigationLink(value: deckInfo) { label }
+            Button {
+                handleTap()
+            } label: {
+                label
+            }
+            .buttonStyle(.plain)
         } else {
             DisclosureGroup {
                 ForEach(node.children) { child in
-                    DeckRowView(node: child, onMutated: onMutated)
+                    DeckRowView(
+                        node: child,
+                        onMutated: onMutated,
+                        onStartReview: onStartReview,
+                        onShowDetail: onShowDetail
+                    )
                 }
             } label: {
-                NavigationLink(value: deckInfo) { label }
+                Button {
+                    handleTap()
+                } label: {
+                    label
+                }
+                .buttonStyle(.plain)
             }
+        }
+    }
+
+    private func handleTap() {
+        if hasCardsToReview {
+            // Start review directly if there are cards to study
+            onStartReview(node.id)
+        } else {
+            // Show deck detail if no cards available
+            onShowDetail(deckInfo)
         }
     }
 
