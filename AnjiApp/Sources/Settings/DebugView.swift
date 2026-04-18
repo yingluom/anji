@@ -260,7 +260,7 @@ struct DebugView: View {
 
     private func loadSystemInfo() {
         // Memory usage
-        let info = mach_task_basic_info()
+        var info = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size)/4
         var kerr: kern_return_t
 
