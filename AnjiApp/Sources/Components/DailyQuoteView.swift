@@ -25,6 +25,7 @@ struct HitokotoResponse: Codable {
 
 /// Daily inspirational quote widget fetching from hitokoto.cn API.
 struct DailyQuoteView: View {
+    @Environment(\.anjiAccent) private var anjiAccent
     @State private var quote: HitokotoResponse?
     @State private var isLoading = true
     @State private var error: Error?
@@ -34,7 +35,7 @@ struct DailyQuoteView: View {
             HStack {
                 Image(systemName: "quote.opening")
                     .font(.title3)
-                    .foregroundStyle(Color.anjiAccent.gradient)
+                    .foregroundStyle(anjiAccent.gradient)
                 
                 Spacer()
                 
@@ -91,7 +92,7 @@ struct DailyQuoteView: View {
                 .fill(.ultraThinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.anjiAccent.opacity(0.2), lineWidth: 1)
+                        .stroke(anjiAccent.opacity(0.2), lineWidth: 1)
                 )
         )
         .onAppear {

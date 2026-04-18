@@ -53,6 +53,7 @@ struct AnjiApp: App {
             }
             .preferredColorScheme(appTheme.colorScheme)
             .tint(accentPreset.color)
+            .environment(\.anjiAccent, accentPreset.color)
             .environment(\.locale, LanguageManager.effectiveLocale(for: preferredLanguage))
             .onOpenURL { url in
                 guard url.scheme == "anji", url.host == "review",

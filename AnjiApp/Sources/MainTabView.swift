@@ -6,6 +6,7 @@ import Sharing
 /// The main tab view — Decks, Browse, Stats, Settings.
 struct MainTabView: View {
     @Binding var pendingReviewDeckId: Int64?
+    @Environment(\.anjiAccent) private var anjiAccent
     @State private var showSync = false
     @State private var refreshToken = UUID()
 
@@ -47,7 +48,7 @@ struct MainTabView: View {
                 }
             }
         }
-        .tint(.anjiAccent)
+        .tint(anjiAccent)
         .sheet(isPresented: $showSync) {
             refreshToken = UUID()
         } content: {

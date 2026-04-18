@@ -7,6 +7,7 @@ import Dependencies
 struct SyncSheet: View {
     @Binding var isPresented: Bool
     @Dependency(\.syncClient) var syncClient
+    @Environment(\.anjiAccent) private var anjiAccent
     @State private var state: SyncState = .idle
     @State private var showLogin = false
     @State private var syncLogs: [String] = []
@@ -81,7 +82,7 @@ struct SyncSheet: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Image(systemName: "rectangle.stack")
-                                .foregroundStyle(Color.anjiAccent)
+                                .foregroundStyle(anjiAccent)
                             Text("Collection Sync")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
@@ -117,10 +118,10 @@ struct SyncSheet: View {
                             if isMediaSyncActive {
                                 Text(formatOperation(mediaProgress.currentOperation))
                                     .font(.caption)
-                                    .foregroundStyle(Color.anjiAccent)
+                                    .foregroundStyle(anjiAccent)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
-                                    .background(Color.anjiAccent.opacity(0.1))
+                                    .background(anjiAccent.opacity(0.1))
                                     .cornerRadius(8)
                             }
                         }
@@ -141,7 +142,7 @@ struct SyncSheet: View {
                                     Text("\(Int(mediaProgress.progress * 100))%")
                                         .font(.caption)
                                         .fontWeight(.medium)
-                                        .foregroundStyle(Color.anjiAccent)
+                                        .foregroundStyle(anjiAccent)
                                 }
                             }
                             
@@ -267,7 +268,7 @@ struct SyncSheet: View {
                 Text(msg).anjiFont(.callout).foregroundStyle(Color.anjiSecondary)
                     .multilineTextAlignment(.center).padding(.horizontal)
                 Button("Retry") { Task { await startSync() } }
-                    .buttonStyle(.borderedProminent).tint(.anjiAccent)
+                    .buttonStyle(.borderedProminent).tint(anjiAccent)
             }
         case .needsFullSync:
             fullSyncView
@@ -342,7 +343,7 @@ extension SyncSheet {
                     Label("Download from Server", systemImage: "arrow.down.circle")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent).tint(.anjiAccent)
+                .buttonStyle(.borderedProminent).tint(anjiAccent)
 
                 Button { Task { await fullSync(.upload) } } label: {
                     Label("Upload to Server", systemImage: "arrow.up.circle")

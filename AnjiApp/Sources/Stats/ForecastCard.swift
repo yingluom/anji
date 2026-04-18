@@ -3,6 +3,7 @@ import Charts
 
 /// Forecast card showing upcoming reviews for the next 30 days.
 struct ForecastCard: View {
+    @Environment(\.anjiAccent) private var anjiAccent
     let data: [ForecastPoint]
 
     private var filteredData: [ForecastPoint] {
@@ -25,7 +26,7 @@ struct ForecastCard: View {
                         x: .value("Day", point.date, unit: .day),
                         y: .value("Cards", point.count)
                     )
-                    .foregroundStyle(Color.anjiAccent.gradient)
+                    .foregroundStyle(anjiAccent.gradient)
                 }
                 .chartXAxis {
                     AxisMarks(values: .automatic(desiredCount: 5)) { value in

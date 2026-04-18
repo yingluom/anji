@@ -6,6 +6,7 @@ import Dependencies
 struct DeckDetailView: View {
     let deck: DeckInfo
     @Dependency(\.deckClient) var deckClient
+    @Environment(\.anjiAccent) private var anjiAccent
     @State private var counts: DeckCounts = .zero
     @State private var showReview = false
 
@@ -17,7 +18,7 @@ struct DeckDetailView: View {
             VStack(spacing: Spacing.md) {
                 Image(systemName: "rectangle.stack.fill")
                     .font(.system(size: 48))
-                    .foregroundStyle(Color.anjiAccent.gradient)
+                    .foregroundStyle(anjiAccent.gradient)
 
                 Text(deck.name)
                     .anjiFont(.title)

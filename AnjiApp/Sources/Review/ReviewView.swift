@@ -4,6 +4,7 @@ import AnkiKit
 struct ReviewView: View {
     let deckId: Int64
     let onDismiss: () -> Void
+    @Environment(\.anjiAccent) private var anjiAccent
 
     @State private var session: ReviewSession
 
@@ -99,7 +100,7 @@ struct ReviewView: View {
                     }
                     .background(
                         Capsule()
-                            .fill(Color.anjiAccent)
+                            .fill(anjiAccent)
                     )
                     .foregroundStyle(.white)
                     .buttonStyle(.plain)
@@ -157,7 +158,7 @@ struct ReviewView: View {
             Spacer()
             Image(systemName: "sparkles")
                 .font(.system(size: 56))
-                .foregroundStyle(Color.anjiAccent.gradient)
+                .foregroundStyle(anjiAccent.gradient)
                 .symbolEffect(.bounce, value: session.isFinished)
 
             Text("review.well_done")

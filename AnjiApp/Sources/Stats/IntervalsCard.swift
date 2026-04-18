@@ -3,6 +3,7 @@ import Charts
 
 /// Intervals distribution card.
 struct IntervalsCard: View {
+    @Environment(\.anjiAccent) private var anjiAccent
     let data: [IntervalPoint]
 
     var body: some View {
@@ -20,7 +21,7 @@ struct IntervalsCard: View {
                         x: .value("Interval", point.intervalDays),
                         y: .value("Cards", point.count)
                     )
-                    .foregroundStyle(Color.anjiAccent.gradient)
+                    .foregroundStyle(anjiAccent.gradient)
                 }
                 .chartXAxis {
                     AxisMarks(values: .automatic(desiredCount: 5))

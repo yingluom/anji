@@ -6,6 +6,7 @@ import Sharing
 struct WelcomeView: View {
     @Shared(.onboardingDone) private var onboardingDone
     @Shared(.syncMode) private var syncMode
+    @Environment(\.anjiAccent) private var anjiAccent
     @State private var showCustomServer = false
     @State private var serverURL = ""
 
@@ -15,7 +16,7 @@ struct WelcomeView: View {
 
             Image(systemName: "book.pages.fill")
                 .font(.system(size: 72))
-                .foregroundStyle(Color.anjiAccent.gradient)
+                .foregroundStyle(anjiAccent.gradient)
                 .symbolEffect(.bounce, options: .nonRepeating)
 
             VStack(spacing: Spacing.sm) {

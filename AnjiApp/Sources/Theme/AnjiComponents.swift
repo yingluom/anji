@@ -47,7 +47,7 @@ struct AnjiPrimaryButton: ButtonStyle {
             .foregroundStyle(.white)
             .padding(.vertical, Spacing.md)
             .padding(.horizontal, Spacing.xl)
-            .background(Color.anjiAccent, in: Capsule())
+            .background(Color.accentColor, in: Capsule())
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
@@ -57,11 +57,11 @@ struct AnjiSecondaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .anjiFont(.bodyBold)
-            .foregroundStyle(Color.anjiAccent)
+            .foregroundStyle(Color.accentColor)
             .padding(.vertical, Spacing.md)
             .padding(.horizontal, Spacing.xl)
             .background(
-                Capsule().stroke(Color.anjiAccent, lineWidth: 1.5)
+                Capsule().stroke(Color.accentColor, lineWidth: 1.5)
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)

@@ -1,14 +1,26 @@
 import SwiftUI
 
+// MARK: - Environment Key for Accent Color
+private struct AnjiAccentKey: EnvironmentKey {
+    static let defaultValue: Color = AccentPreset.indigo.color
+}
+
+extension EnvironmentValues {
+    /// The current accent color for interactive elements.
+    /// Set this at the root view via `.environment(\.anjiAccent, accentPreset.color)`
+    var anjiAccent: Color {
+        get { self[AnjiAccentKey.self] }
+        set { self[AnjiAccentKey.self] = newValue }
+    }
+}
+
 // MARK: - Anji Design System — Colors
 // Neutrals are fixed; accent is driven by the user's AccentPreset choice and
 // must be applied at the view layer via `.environment(\.anjiAccent, …)` or
 // by reading `AccentPreset.current.color` from an `@Shared(.accentPreset)`.
 //
-// For simplicity, `Color.anjiAccent` remains the legacy deep-indigo default so
-// that any code not yet migrated keeps working. The root view tree passes the
-// preferred accent down via `.tint(...)` which is what SwiftUI uses for
-// interactive elements.
+// The static `Color.anjiAccent` now reads from the environment, so views must
+// access it via `@Environment(\.anjiAccent) var anjiAccent`.
 
 extension Color {
     // Backgrounds
@@ -21,7 +33,7 @@ extension Color {
     static let anjiSecondary  = Color(light: .black.opacity(0.65), dark: .white.opacity(0.72))
     static let anjiTertiary   = Color(light: .black.opacity(0.38), dark: .white.opacity(0.42))
 
-    // Legacy accent (used as fallback when no AccentPreset env is available).
+    // Legacy accent (deprecated - use @Environment(\.anjiAccent) instead).
     static let anjiAccent     = AccentPreset.indigo.color
     // Teal for secondary actions (kept stable regardless of accent)
     static let anjiTeal       = Color(light: Color(hex: 0x0D9488), dark: Color(hex: 0x2DD4BF))
