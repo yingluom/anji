@@ -64,15 +64,24 @@ final class ReviewSession {
     func undo() {
         guard canUndo else { return }
         do {
+            // Stop any playing audio first
+            NotificationCenter.default.post(name: .init("AnjiStopAudio"), object: nil)
+
             try collection.undoLast()
             canUndo = false
             stats.reviewed -= 1
             if let r = lastRating, r != .again { stats.correct -= 1 }
             lastRating = nil
 
+            // Reload queue to get the undone card back
             reloadQueue()
+
+            // Reset to show the first card (the undone one) as question
+            showingAnswer = false
             advanceToNext()
-        } catch {}
+        } catch {
+            // Silent fail - undo not available
+        }
     }
 
     // MARK: Private

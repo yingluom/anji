@@ -50,10 +50,11 @@ struct CardWebView: UIViewRepresentable {
         let audioFiles = Self.extractAudioFiles(from: html)
         let processedHTML = Self.rewriteMediaPaths(html)
 
-        let wrapper = Self.buildDocument(bodyHTML: processedHTML, autoplayAudio: autoplayAudio)
+        // Disable JS autoplay - use native player only to avoid double playback
+        let wrapper = Self.buildDocument(bodyHTML: processedHTML, autoplayAudio: false)
         webView.loadHTMLString(wrapper, baseURL: nil)
 
-        // Use native player as a reliable fallback (WKWebView autoplay can be blocked).
+        // Use native player exclusively for reliable iOS audio playback
         if autoplayAudio {
             context.coordinator.playAudioSequence(audioFiles)
         } else {
@@ -271,6 +272,21 @@ struct CardWebView: UIViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         private var player: AVAudioPlayer?
         private var queue: [URL] = []
+
+        override init() {
+            super.init()
+            // Listen for undo notification to stop audio
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleStopAudio),
+                name: .init("AnjiStopAudio"),
+                object: nil
+            )
+        }
+
+        @objc private func handleStopAudio() {
+            stopAudio()
+        }
 
         func playAudioSequence(_ filenames: [String]) {
             stopAudio()
