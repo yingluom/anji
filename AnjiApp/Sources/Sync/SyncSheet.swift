@@ -248,16 +248,179 @@ struct SyncSheet: View {
                 .padding(.vertical)
             }
         case .success(let summary):
-            VStack(spacing: Spacing.md) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 52))
-                    .foregroundStyle(Color.anjiSuccess)
-                Text("Sync Complete")
-                    .anjiFont(.headline)
-                if summary.isUpToDate {
-                    Text("Everything is up to date")
-                        .anjiFont(.callout).foregroundStyle(Color.anjiSecondary)
+            ScrollView {
+                VStack(spacing: Spacing.lg) {
+                    // Header with checkmark
+                    VStack(spacing: Spacing.sm) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 56))
+                            .foregroundStyle(Color.anjiSuccess)
+                        Text("Sync Complete")
+                            .anjiFont(.headline)
+                        if summary.isUpToDate && mediaProgress.downloaded == 0 && mediaProgress.uploaded == 0 {
+                            Text("Everything is up to date")
+                                .anjiFont(.callout)
+                                .foregroundStyle(Color.anjiSecondary)
+                        }
+                    }
+                    .padding(.top)
+
+                    // Collection Sync Summary Card
+                    if summary.cardsPulled > 0 || summary.cardsPushed > 0 || summary.notesPulled > 0 || summary.notesPushed > 0 {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Image(systemName: "rectangle.stack")
+                                    .foregroundStyle(anjiAccent)
+                                Text("Collection Sync")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(Color.anjiSuccess)
+                            }
+
+                            Divider()
+
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
+                                MediaStatItem(
+                                    icon: "arrow.down.circle.fill",
+                                    count: summary.cardsPulled,
+                                    label: "Cards Pulled",
+                                    color: .blue
+                                )
+                                MediaStatItem(
+                                    icon: "arrow.up.circle.fill",
+                                    count: summary.cardsPushed,
+                                    label: "Cards Pushed",
+                                    color: .green
+                                )
+                                MediaStatItem(
+                                    icon: "doc.badge.arrow.down",
+                                    count: summary.notesPulled,
+                                    label: "Notes Pulled",
+                                    color: .cyan
+                                )
+                                MediaStatItem(
+                                    icon: "doc.badge.arrow.up",
+                                    count: summary.notesPushed,
+                                    label: "Notes Pushed",
+                                    color: .mint
+                                )
+                            }
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.anjiSurface)
+                        )
+                        .padding(.horizontal)
+                    }
+
+                    // Media Sync Summary Card
+                    if mediaProgress.downloaded > 0 || mediaProgress.uploaded > 0 || mediaProgress.removed > 0 {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Image(systemName: "photo.on.rectangle.angled")
+                                    .foregroundStyle(Color.purple)
+                                Text("Media Sync")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(Color.anjiSuccess)
+                            }
+
+                            Divider()
+
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
+                                MediaStatItem(
+                                    icon: "arrow.down.circle.fill",
+                                    count: mediaProgress.downloaded,
+                                    label: "Downloaded",
+                                    color: .blue
+                                )
+                                MediaStatItem(
+                                    icon: "arrow.up.circle.fill",
+                                    count: mediaProgress.uploaded,
+                                    label: "Uploaded",
+                                    color: .green
+                                )
+                                MediaStatItem(
+                                    icon: "trash.circle.fill",
+                                    count: mediaProgress.removed,
+                                    label: "Removed",
+                                    color: .red
+                                )
+                            }
+
+                            if mediaProgress.checked > 0 {
+                                HStack {
+                                    Spacer()
+                                    Text("\(mediaProgress.checked) files checked")
+                                        .font(.caption)
+                                        .foregroundStyle(Color.anjiTertiary)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.anjiSurface)
+                        )
+                        .padding(.horizontal)
+                    }
+
+                    // Sync logs card (keep visible after sync)
+                    if !syncLogs.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Image(systemName: "doc.text")
+                                    .foregroundStyle(Color.gray)
+                                Text("Sync Log")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Text("\(syncLogs.count) entries")
+                                    .font(.caption2)
+                                    .foregroundStyle(Color.anjiTertiary)
+                            }
+
+                            Divider()
+
+                            ScrollView(.vertical, showsIndicators: true) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    ForEach(Array(syncLogs.enumerated()), id: \.offset) { index, log in
+                                        HStack(alignment: .top, spacing: 8) {
+                                            Text("\(index + 1)")
+                                                .font(.caption2)
+                                                .foregroundStyle(Color.anjiTertiary)
+                                                .frame(width: 24, alignment: .leading)
+                                            Text(log)
+                                                .font(.caption)
+                                                .foregroundStyle(Color.anjiSecondary)
+                                                .lineLimit(2)
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(maxHeight: 150)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.anjiSurface)
+                        )
+                        .padding(.horizontal)
+                    }
                 }
+                .padding(.vertical)
             }
         case .error(let msg):
             VStack(spacing: Spacing.md) {
