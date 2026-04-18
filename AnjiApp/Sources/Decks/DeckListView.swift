@@ -95,7 +95,7 @@ struct DeckListView: View {
     // MARK: - Home Stat Cards
     
     private var enabledStatCards: [String] {
-        Array(homeStatCards.split(separator: ",")).map { String($0) }
+        homeStatCards.components(separatedBy: ",")
     }
     
     private func isStatCardEnabled(_ cardId: String) -> Bool {

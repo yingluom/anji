@@ -164,7 +164,7 @@ struct NoteEditorView: View {
                     addTag()
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.anjiAccent)
+                        .foregroundStyle(Color.anjiAccent)
                 }
                 .disabled(newTag.isEmpty)
             }
@@ -295,7 +295,7 @@ struct NoteEditorView: View {
     private func localizedFieldName(_ name: String) -> String {
         // Try to find localization key for common field names
         let key = "editor.field.\(name.lowercased().replacingOccurrences(of: " ", with: "_"))"
-        let localized = String(localized: LocalizedStringKey(key))
+        let localized = String(localized: .init(stringLiteral: key))
         
         // If not found (returns the key itself), use original name
         if localized == key {
@@ -338,7 +338,7 @@ struct NoteEditorView: View {
         guard let loaded = try? noteClient.fetch(noteId) else { return }
         note = loaded
         fieldValues = loaded.fieldList
-        tags = loaded.tags
+        tags = loaded.tags.components(separatedBy: " ").filter { !$0.isEmpty }
         
         if let nt = try? notetypes.getNotetype(loaded.notetypeId) {
             fieldNames = nt.fieldNames
@@ -349,7 +349,7 @@ struct NoteEditorView: View {
         guard var n = note else { return }
         isSaving = true
         n.fields = fieldValues.joined(separator: "\u{1f}")
-        n.tags = tags
+        n.tags = tags.joined(separator: " ")
         try? noteClient.save(n)
         isSaving = false
         dismiss()

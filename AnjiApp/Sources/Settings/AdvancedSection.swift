@@ -63,12 +63,12 @@ struct AdvancedSection: View {
     }
     
     private func isStatCardEnabled(_ cardId: String) -> Bool {
-        let cards: [String] = Array(homeStatCards.split(separator: ",")).map { String($0) }
+        let cards = homeStatCards.components(separatedBy: ",")
         return cards.contains(cardId)
     }
     
     private func toggleStatCard(_ cardId: String, enabled: Bool) {
-        var cards: [String] = Array(homeStatCards.split(separator: ",")).map { String($0) }
+        var cards = homeStatCards.components(separatedBy: ",")
         if enabled {
             if !cards.contains(cardId) {
                 cards.append(cardId)
