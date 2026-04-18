@@ -2,14 +2,18 @@ import SwiftUI
 import AnkiKit
 import AnkiClients
 import Dependencies
+import Sharing
 
 struct DeckListView: View {
     @Dependency(\.deckClient) var deckClient
+    @Shared(.dailyQuoteEnabled) private var dailyQuoteEnabled
+    @Shared(.homeStatCards) private var homeStatCards
     @State private var tree: [DeckTreeNode] = []
     @State private var isLoading = true
     @State private var showCreateSheet = false
     @State private var reviewDeckId: Int64? = nil
     @State private var showDeckDetail: DeckInfo? = nil
+    @State private var todayStats: TodayStats?
 
     var body: some View {
         Group {
@@ -24,11 +28,17 @@ struct DeckListView: View {
                 )
             } else {
                 List {
-                    Section {
-                        DailyQuoteView()
-                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                            .listRowBackground(Color.clear)
+                    // Daily Quote Section (conditional)
+                    if dailyQuoteEnabled {
+                        Section {
+                            DailyQuoteView()
+                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                .listRowBackground(Color.clear)
+                        }
                     }
+                    
+                    // Home Stat Cards Section (conditional)
+                    homeStatCardsSection
 
                     ForEach(tree) { node in
                         DeckRowView(
@@ -80,6 +90,97 @@ struct DeckListView: View {
             tree = []
         }
         isLoading = false
+    }
+    
+    // MARK: - Home Stat Cards
+    
+    private var enabledStatCards: [String] {
+        homeStatCards.split(separator: ",").map(String.init)
+    }
+    
+    private func isStatCardEnabled(_ cardId: String) -> Bool {
+        enabledStatCards.contains(cardId)
+    }
+    
+    @ViewBuilder
+    private var homeStatCardsSection: some View {
+        if !enabledStatCards.isEmpty {
+            Section {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    if isStatCardEnabled("today"), let stats = todayStats {
+                        TodayCard(stats: stats)
+                    }
+                    if isStatCardEnabled("cardCounts") {
+                        CardCountsMiniCard()
+                    }
+                    if isStatCardEnabled("forecast") {
+                        ForecastMiniCard()
+                    }
+                    if isStatCardEnabled("reviews") {
+                        ReviewsMiniCard()
+                    }
+                    if isStatCardEnabled("retention") {
+                        RetentionMiniCard()
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowBackground(Color.clear)
+            }
+        }
+    }
+}
+
+// MARK: - Mini Stat Cards
+
+struct CardCountsMiniCard: View {
+    var body: some View {
+        StatMiniCard(title: "卡片数量", icon: "number", color: .anjiTeal)
+    }
+}
+
+struct ForecastMiniCard: View {
+    var body: some View {
+        StatMiniCard(title: "未来预测", icon: "calendar", color: .anjiSuccess)
+    }
+}
+
+struct ReviewsMiniCard: View {
+    var body: some View {
+        StatMiniCard(title: "复习统计", icon: "chart.line.uptrend.xyaxis", color: .anjiAccent)
+    }
+}
+
+struct RetentionMiniCard: View {
+    var body: some View {
+        StatMiniCard(title: "保留率", icon: "brain.head.profile", color: .purple)
+    }
+}
+
+struct StatMiniCard: View {
+    let title: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(color)
+            Text(title)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.anjiPrimary)
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(color.opacity(0.2), lineWidth: 1)
+                )
+        )
     }
 }
 

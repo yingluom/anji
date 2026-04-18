@@ -781,6 +781,36 @@
         "en": { "stringUnit": { "state": "translated", "value": "No retention data available" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无保留率数据" } }
       }
+    },
+    "settings.daily_quote": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Daily Quote" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "每日一言" } }
+      }
+    },
+    "settings.daily_quote.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Show inspirational quotes on the home screen. You can change the quote provider and type in the widget." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "在主页显示每日一言。你可以在组件中切换接口和类型。" } }
+      }
+    },
+    "settings.section.home_display": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Home Display" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "主页显示" } }
+      }
+    },
+    "settings.section.home_stats": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Home Statistics" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "主页统计" } }
+      }
+    },
+    "settings.home_stats.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Select which statistics cards to display on the home screen." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "选择在主页显示哪些统计卡片。" } }
+      }
     }
   }
 }

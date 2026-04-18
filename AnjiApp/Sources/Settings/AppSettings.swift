@@ -121,6 +121,16 @@ extension SharedReaderKey where Self == AppStorageKey<Bool>.Default {
     static var liveActivityEnabled: Self {
         Self[.appStorage("liveActivityEnabled"), default: true]
     }
+    
+    /// Enable daily quote on home screen.
+    static var dailyQuoteEnabled: Self {
+        Self[.appStorage("dailyQuoteEnabled"), default: true]
+    }
+    
+    /// Which stat cards to show on home page (stored as comma-separated list).
+    static var homeStatCards: Self {
+        Self[.appStorage("homeStatCards"), default: "today,cardCounts"]
+    }
 }
 
 extension SharedReaderKey where Self == AppStorageKey<SyncMode>.Default {

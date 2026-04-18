@@ -1,12 +1,21 @@
 import SwiftUI
 import Sharing
 
-/// Advanced settings — sync options, Live Activity, etc.
-/// Debug tools moved to About section with 8-tap unlock gesture.
+/// Advanced settings — sync options, Live Activity, daily quote, etc.
 struct AdvancedSection: View {
     @Shared(.autoSync) private var autoSync
     @Shared(.wifiOnlySync) private var wifiOnlySync
     @Shared(.liveActivityEnabled) private var liveActivityEnabled
+    @Shared(.dailyQuoteEnabled) private var dailyQuoteEnabled
+    @Shared(.homeStatCards) private var homeStatCards
+    
+    private let availableStatCards = [
+        ("today", "今日统计", "chart.bar"),
+        ("cardCounts", "卡片数量", "number"),
+        ("forecast", "未来预测", "calendar"),
+        ("reviews", "复习统计", "chart.line.uptrend.xyaxis"),
+        ("retention", "保留率", "brain.head.profile")
+    ]
 
     var body: some View {
         Section {
@@ -25,12 +34,47 @@ struct AdvancedSection: View {
             }
         } header: {
             Text("settings.section.advanced")
-        } footer: {
-            if #available(iOS 16.1, *) {
-                Text("settings.advanced.footer.live_activity")
-            } else {
-                Text("Debug tools can be accessed by tapping the version number 8 times in About.")
-            }
         }
+        
+        Section {
+            Toggle(isOn: Binding($dailyQuoteEnabled)) {
+                Label("settings.daily_quote", systemImage: "quote.bubble")
+            }
+        } header: {
+            Text("settings.section.home_display")
+        } footer: {
+            Text("settings.daily_quote.footer")
+        }
+        
+        Section {
+            ForEach(availableStatCards, id: \.0) { card in
+                Toggle(isOn: Binding(
+                    get: { isStatCardEnabled(card.0) },
+                    set: { toggleStatCard(card.0, enabled: $0) }
+                )) {
+                    Label(card.1, systemImage: card.2)
+                }
+            }
+        } header: {
+            Text("settings.section.home_stats")
+        } footer: {
+            Text("settings.home_stats.footer")
+        }
+    }
+    
+    private func isStatCardEnabled(_ cardId: String) -> Bool {
+        homeStatCards.split(separator: ",").map(String.init).contains(cardId)
+    }
+    
+    private func toggleStatCard(_ cardId: String, enabled: Bool) {
+        var cards = homeStatCards.split(separator: ",").map(String.init)
+        if enabled {
+            if !cards.contains(cardId) {
+                cards.append(cardId)
+            }
+        } else {
+            cards.removeAll { $0 == cardId }
+        }
+        $homeStatCards.withLock { $0 = cards.joined(separator: ",") }
     }
 }
