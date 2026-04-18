@@ -96,16 +96,17 @@ struct CardWebView: UIViewRepresentable {
         <html>
         <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <style>
-            /* Base styles */
+            /* Base reset */
+            html { -webkit-text-size-adjust: 100%; }
             * { box-sizing: border-box; }
             html, body { margin: 0; padding: 0; background: transparent; }
             body {
                 font-family: -apple-system, system-ui, "Helvetica Neue", "Hiragino Sans", sans-serif;
                 font-size: 18px;
                 line-height: 1.6;
-                padding: 20px;
+                padding: 16px;
                 color: #1a1a2e;
                 word-wrap: break-word;
                 -webkit-text-size-adjust: 100%;
@@ -146,7 +147,20 @@ struct CardWebView: UIViewRepresentable {
             /* Media elements */
             img, video { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 8px auto; }
             hr { border: none; border-top: 1px solid rgba(0,0,0,0.15); margin: 16px 0; }
-            audio { width: 100%; margin: 8px 0; }
+            audio {
+                width: 100%;
+                margin: 12px 0;
+                min-height: 44px;
+                display: block;
+            }
+            /* Ensure audio controls are visible */
+            audio::-webkit-media-controls {
+                display: flex !important;
+            }
+            audio::-webkit-media-controls-panel {
+                background: rgba(128,128,128,0.1);
+                border-radius: 8px;
+            }
 
             /* Tables */
             table { border-collapse: collapse; margin: 8px 0; width: 100%; }
@@ -212,6 +226,43 @@ struct CardWebView: UIViewRepresentable {
             .center { text-align: center; }
             .left { text-align: left; }
             .right { text-align: right; }
+
+            /* Fix for iOS audio player not showing */
+            audio:not([src]) { display: none; }
+            audio[src=""] { display: none; }
+
+            /* Ensure all content is visible */
+            .card * { max-width: 100%; }
+
+            /* Anki's standard template classes */
+            #qa { font-size: 1.2em; line-height: 1.6; }
+            .qacontainer { width: 100%; }
+
+            /* Common Anki card template layout classes */
+            .extra, .info, .tags { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(128,128,128,0.2); }
+            .card .extra, .card .info { display: block; }
+            .deck, .subdeck { font-size: 0.9em; color: rgba(128,128,128,0.7); margin-bottom: 8px; }
+            .answer { font-weight: 600; }
+
+            /* Two-column layouts common in card templates */
+            .container, .row { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+            .col, .col-left, .col-right { flex: 1 1 45%; min-width: 140px; }
+            .col-left { text-align: left; }
+            .col-right { text-align: right; }
+
+            /* Ensure floated elements don't get clipped */
+            .clearfix::after { content: ""; display: table; clear: both; }
+            .float-left { float: left; }
+            .float-right { float: right; }
+
+            /* Mobile-specific fixes */
+            @supports (-webkit-touch-callout: none) {
+                /* iOS specific */
+                audio { min-height: 44px; }
+            }
+
+            /* Prevent horizontal overflow */
+            .card { overflow-x: hidden; word-break: break-word; }
         </style>
         </head>
         <body><div class="card">\(bodyHTML)</div></body>

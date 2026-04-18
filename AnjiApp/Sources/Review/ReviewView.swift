@@ -78,8 +78,11 @@ struct ReviewView: View {
             .padding(.top, 8)
             .padding(.bottom, 4)
 
-            CardWebView(html: session.showingAnswer ? session.answerHTML : session.questionHTML)
-                .frame(maxHeight: .infinity)
+            ScrollView {
+                CardWebView(html: session.showingAnswer ? session.answerHTML : session.questionHTML)
+                    .frame(minHeight: 100)
+            }
+            .frame(maxHeight: .infinity)
 
             if session.showingAnswer {
                 ratingButtons
