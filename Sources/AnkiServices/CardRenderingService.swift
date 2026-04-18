@@ -28,14 +28,15 @@ extension CardRenderingService: DependencyKey {
                 var questionHTML = renderNodes(rendered.questionNodes)
                 var answerHTML = renderNodes(rendered.answerNodes)
 
-                // Prepend CSS if present
-                if !rendered.css.isEmpty {
-                    let style = "<style>\(rendered.css)</style>"
-                    questionHTML = style + questionHTML
-                    answerHTML = style + answerHTML
-                }
+                // Store template CSS separately - it will be injected after our base CSS
+                // in CardWebView so template styles can override defaults
+                let templateCSS = rendered.css
 
-                return RenderedCard(questionHTML: questionHTML, answerHTML: answerHTML)
+                return RenderedCard(
+                    questionHTML: questionHTML,
+                    answerHTML: answerHTML,
+                    templateCSS: templateCSS
+                )
             }
         )
     }()

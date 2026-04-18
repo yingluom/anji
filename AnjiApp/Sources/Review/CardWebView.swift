@@ -17,6 +17,7 @@ enum MediaPaths {
 /// - Support for images, audio, and video referenced by Anki note templates
 struct CardWebView: UIViewRepresentable {
     let html: String
+    let templateCSS: String
     var autoplayAudio: Bool = true
 
     func makeCoordinator() -> Coordinator {
@@ -51,8 +52,12 @@ struct CardWebView: UIViewRepresentable {
         let audioFiles = Self.extractAudioFiles(from: html)
         let processedHTML = Self.rewriteMediaPaths(html)
 
-        // Disable JS autoplay - use native player only to avoid double playback
-        let wrapper = Self.buildDocument(bodyHTML: processedHTML, autoplayAudio: false)
+        // Build document with template CSS injected after base CSS so it can override
+        let wrapper = Self.buildDocument(
+            bodyHTML: processedHTML,
+            templateCSS: templateCSS,
+            autoplayAudio: false
+        )
         webView.loadHTMLString(wrapper, baseURL: nil)
 
         // Use native player exclusively for reliable iOS audio playback
@@ -69,7 +74,9 @@ struct CardWebView: UIViewRepresentable {
 
     // MARK: - HTML Document
 
-    private static func buildDocument(bodyHTML: String, autoplayAudio: Bool) -> String {
+    private static func buildDocument(bodyHTML: String, templateCSS: String, autoplayAudio: Bool) -> String {
+        // Prepare template CSS injection - placed after our base CSS so it takes precedence
+        let templateCSSInjection = templateCSS.isEmpty ? "" : "<style>\(templateCSS)</style>"
         let autoplayScript = autoplayAudio ? """
         <script>
         (function() {
@@ -102,20 +109,57 @@ struct CardWebView: UIViewRepresentable {
             html { -webkit-text-size-adjust: 100%; }
             * { box-sizing: border-box; }
             html, body { margin: 0; padding: 0; background: transparent; }
+
+            /*
+             * Font stack that allows card template CSS to override.
+             * Card templates often use custom fonts via @font-face or system fonts.
+             * We provide a comprehensive fallback stack for CJK and other scripts.
+             */
             body {
-                font-family: -apple-system, system-ui, "Helvetica Neue", "Hiragino Sans", sans-serif;
+                /* Default iOS system fonts, but card CSS can override via .card class */
+                font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 font-size: 18px;
                 line-height: 1.6;
                 padding: 16px;
                 color: #1a1a2e;
                 word-wrap: break-word;
                 -webkit-text-size-adjust: 100%;
+                /* Allow font smoothing like desktop */
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            /* Anki card template wrapper */
+            /*
+             * The .card class is what Anki templates use.
+             * We set a more comprehensive font stack here that includes CJK fonts.
+             * Card template CSS can still override this.
+             */
             .card {
                 background: transparent;
                 color: inherit;
+                /* Comprehensive font stack matching Anki desktop behavior */
+                font-family: inherit;
+            }
+
+            /* Support for card templates that explicitly set font-family */
+            .card[style*="font-family"] {
+                /* Keep the inline style font */
+            }
+
+            /* CJK Font Support - Common fonts used in Anki templates */
+            :lang(zh), :lang(zh-CN), :lang(zh-TW), :lang(zh-HK), .chinese {
+                font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", "Noto Sans CJK SC", sans-serif;
+            }
+            :lang(ja), :lang(jp), .japanese {
+                font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+            }
+            :lang(ko), :lang(kr), .korean {
+                font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Nanum Gothic", sans-serif;
+            }
+
+            /* Allow @font-face from card template CSS to work */
+            @font-face {
+                font-display: swap;
             }
 
             /* Light mode colors */
@@ -264,6 +308,7 @@ struct CardWebView: UIViewRepresentable {
             /* Prevent horizontal overflow */
             .card { overflow-x: hidden; word-break: break-word; }
         </style>
+        \(templateCSSInjection)
         </head>
         <body><div class="card">\(bodyHTML)</div></body>
         \(autoplayScript)

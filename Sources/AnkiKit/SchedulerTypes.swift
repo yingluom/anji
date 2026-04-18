@@ -75,9 +75,11 @@ public struct QueuedCardsResult: Sendable {
 public struct RenderedCard: Sendable {
     public let questionHTML: String
     public let answerHTML: String
+    public let templateCSS: String
 
-    package init(questionHTML: String, answerHTML: String) {
+    package init(questionHTML: String, answerHTML: String, templateCSS: String = "") {
         self.questionHTML = questionHTML
         self.answerHTML = answerHTML
+        self.templateCSS = templateCSS
     }
 }

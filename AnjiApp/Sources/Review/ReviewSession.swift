@@ -41,6 +41,7 @@ final class ReviewSession {
 
     private(set) var questionHTML = ""
     private(set) var answerHTML = ""
+    private(set) var templateCSS = ""
     private(set) var showingAnswer = false
     private(set) var stats = SessionStats()
     private(set) var remainingCounts: DeckCounts = .zero
@@ -148,9 +149,11 @@ final class ReviewSession {
         if let rendered = try? rendering.renderCard(next.card.id) {
             questionHTML = rendered.questionHTML
             answerHTML = rendered.answerHTML
+            templateCSS = rendered.templateCSS
         } else {
             questionHTML = "<p style='color:red'>Failed to render card</p>"
             answerHTML = questionHTML
+            templateCSS = ""
         }
     }
 }

@@ -79,8 +79,11 @@ struct ReviewView: View {
             .padding(.bottom, 4)
 
             ScrollView {
-                CardWebView(html: session.showingAnswer ? session.answerHTML : session.questionHTML)
-                    .frame(minHeight: 100)
+                CardWebView(
+                    html: session.showingAnswer ? session.answerHTML : session.questionHTML,
+                    templateCSS: session.templateCSS
+                )
+                .frame(minHeight: 100)
             }
             .frame(maxHeight: .infinity)
 
