@@ -17,14 +17,14 @@ jobs:
           submodules: recursive
 
       - name: Cache SPM dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: build/spm_cache
           key: spm-${{ runner.os }}-${{ hashFiles('AnjiApp/AnjiApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
       - name: Cache Rust build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -34,7 +34,7 @@ jobs:
           restore-keys: rust-${{ runner.os }}-
 
       - name: Cache Homebrew
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/Library/Caches/Homebrew
@@ -68,6 +68,9 @@ jobs:
 
       - name: Build Archive (optimized)
         run: |
+          mkdir -p build
+          echo "Starting xcodebuild archive..."
+
           xcodebuild archive \
             -project AnjiApp/AnjiApp.xcodeproj \
             -scheme AnjiApp \
@@ -87,11 +90,13 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
             ENABLE_BITCODE=NO \
-            2>&1 | tee build/xcodebuild.log
+            2>&1 | tee build/xcodebuild.log || true
 
           if [ ${PIPESTATUS[0]} -ne 0 ]; then
-            echo "Build failed! Errors:"
-            grep -n "error:" build/xcodebuild.log | head -30
+            echo "Build failed! Showing errors:"
+            if [ -f build/xcodebuild.log ]; then
+              grep -n "error:" build/xcodebuild.log | head -30
+            fi
             exit 1
           fi
 
@@ -104,6 +109,7 @@ jobs:
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: AnjiApp-unsigned
           path: build/AnjiApp-unsigned.ipa
@@ -111,7 +117,7 @@ jobs:
 
       - name: Upload Build Log
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
           name: xcodebuild-log
           path: build/xcodebuild.log
