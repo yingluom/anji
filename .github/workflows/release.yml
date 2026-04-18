@@ -19,14 +19,13 @@ jobs:
           submodules: recursive
 
       - name: Setup Rust
-        uses: dtolnay/rust-action@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-apple-ios, aarch64-apple-ios-sim
 
       - name: Install dependencies
         run: |
           brew install protobuf swift-protobuf xcodegen
-          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
 
       - name: Build XCFramework
         run: bash scripts/build-xcframework.sh
