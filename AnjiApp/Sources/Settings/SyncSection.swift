@@ -33,30 +33,15 @@ struct SyncSection: View {
                 SyncSheet(isPresented: $showSyncSheet)
             }
 
-            Toggle(isOn: Binding(
-                get: { autoSync },
-                set: { newValue in
-                    autoSync = newValue
-                }
-            )) {
+            Toggle(isOn: Binding($autoSync)) {
                 Label("settings.auto_sync", systemImage: "arrow.clockwise.circle")
             }
 
-            Toggle(isOn: Binding(
-                get: { wifiOnlySync },
-                set: { newValue in
-                    wifiOnlySync = newValue
-                }
-            )) {
+            Toggle(isOn: Binding($wifiOnlySync)) {
                 Label("settings.wifi_only", systemImage: "wifi")
             }
 
-            Toggle(isOn: Binding(
-                get: { mediaSyncEnabled },
-                set: { newValue in
-                    mediaSyncEnabled = newValue
-                }
-            )) {
+            Toggle(isOn: Binding($mediaSyncEnabled)) {
                 Label("settings.media_sync", systemImage: "photo.on.rectangle.angled")
             }
         } header: {

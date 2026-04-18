@@ -10,16 +10,16 @@ struct AdvancedSection: View {
 
     var body: some View {
         Section {
-            Toggle(isOn: $autoSync) {
+            Toggle(isOn: Binding($autoSync)) {
                 Label("settings.auto_sync", systemImage: "arrow.clockwise.circle")
             }
 
-            Toggle(isOn: $wifiOnlySync) {
+            Toggle(isOn: Binding($wifiOnlySync)) {
                 Label("settings.wifi_only", systemImage: "wifi")
             }
 
             if #available(iOS 16.1, *) {
-                Toggle(isOn: $liveActivityEnabled) {
+                Toggle(isOn: Binding($liveActivityEnabled)) {
                     Label("settings.live_activity", systemImage: "island.2")
                 }
             }
