@@ -1,6 +1,7 @@
 import SwiftUI
 import WebKit
 import AVFoundation
+import UIKit
 
 /// Media directory used by Anji to cache card media (matches AnjiApp collection location).
 enum MediaPaths {

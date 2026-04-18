@@ -1,4 +1,5 @@
 import ActivityKit
+import WidgetKit
 import SwiftUI
 
 /// Live Activity attributes for Anji study session
