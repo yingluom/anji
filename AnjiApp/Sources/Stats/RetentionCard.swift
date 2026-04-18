@@ -41,7 +41,7 @@ struct RetentionCard: View {
                             .foregroundStyle(.secondary)
                         Text("\(retention.youngPassed + retention.maturePassed)")
                             .font(.subheadline.bold())
-                            .foregroundStyle(.anjiSuccess)
+                            .foregroundStyle(Color.anjiSuccess)
                     }
                     
                     Spacer()
@@ -52,7 +52,7 @@ struct RetentionCard: View {
                             .foregroundStyle(.secondary)
                         Text("\(retention.youngFailed + retention.matureFailed)")
                             .font(.subheadline.bold())
-                            .foregroundStyle(.anjiWarning)
+                            .foregroundStyle(Color.anjiWarning)
                     }
                 }
                 .padding(.top, 4)
