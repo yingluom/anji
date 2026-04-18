@@ -9,23 +9,16 @@ extension NoteClient: DependencyKey {
             fetch: { try notes.getNote($0) },
             search: { query, limit in
                 let ids = try notes.searchNoteIds(query)
-                let bounded = Array(ids.prefix(limit ?? 5000))
-                let batchSize = min(bounded.count, 50)
+                let bounded = Array(ids.prefix(limit ?? 500))
                 var results: [NoteRecord] = []
                 results.reserveCapacity(bounded.count)
 
-                // Load first batch eagerly
-                for nid in bounded.prefix(batchSize) {
+                // Load all notes (batch loading with error handling)
+                for nid in bounded {
                     if let note = try? notes.getNote(nid) {
                         results.append(note)
                     }
-                }
-                // Remaining notes as stubs (lazy-loaded on demand)
-                for nid in bounded.dropFirst(batchSize) {
-                    results.append(NoteRecord(
-                        id: nid, guid: "", notetypeId: 0, modifiedAt: 0,
-                        fields: "", sortField: "Loading…", checksum: 0
-                    ))
+                    // Silently skip notes that fail to load
                 }
                 return results
             },

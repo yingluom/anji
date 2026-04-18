@@ -11,7 +11,16 @@ struct BrowseView: View {
 
     var body: some View {
         List {
-            if notes.isEmpty && !isSearching {
+            if isSearching {
+                Section {
+                    HStack {
+                        Spacer()
+                        ProgressView("Searching…")
+                            .padding()
+                        Spacer()
+                    }
+                }
+            } else if notes.isEmpty {
                 ContentUnavailableView.search
             } else {
                 ForEach(notes, id: \.id) { note in
