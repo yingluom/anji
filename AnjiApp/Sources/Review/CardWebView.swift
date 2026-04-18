@@ -307,10 +307,54 @@ struct CardWebView: UIViewRepresentable {
 
             /* Prevent horizontal overflow */
             .card { overflow-x: hidden; word-break: break-word; }
+            /* Full height coverage for card background */
+            html, body {
+                min-height: 100%;
+                height: 100%;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+            .card {
+                flex: 1;
+                min-height: 100%;
+            }
+
+            /* Link styling for better visibility and touch */
+            a {
+                color: #007AFF;
+                text-decoration: underline;
+                text-underline-offset: 2px;
+                -webkit-tap-highlight-color: rgba(0, 122, 255, 0.3);
+            }
+            a:active {
+                opacity: 0.7;
+            }
+            a:visited {
+                color: #5856D6;
+            }
+
+            /* Ensure links have minimum touch target */
+            a, button, [role="button"] {
+                min-height: 44px;
+                min-width: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* iOS specific link handling */
+            a[href^="http"], a[href^="https"] {
+                cursor: pointer;
+                pointer-events: auto;
+            }
         </style>
         \(templateCSSInjection)
         </head>
-        <body><div class="card">\(bodyHTML)</div></body>
+        <body>
+            <div class="card">\(bodyHTML)</div>
+        </body>
         \(autoplayScript)
         </html>
         """
@@ -383,6 +427,54 @@ struct CardWebView: UIViewRepresentable {
 
         @objc private func handleStopAudio() {
             stopAudio()
+        }
+
+        // MARK: - Navigation Handling (for hyperlinks)
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            guard let url = navigationAction.request.url else {
+                decisionHandler(.allow)
+                return
+            }
+
+            // Allow internal navigation (ankimedia scheme, about:blank, etc.)
+            if url.scheme == "ankimedia" || url.scheme == "about" {
+                decisionHandler(.allow)
+                return
+            }
+
+            // For http/https links, open in Safari instead of navigating
+            if url.scheme == "http" || url.scheme == "https" {
+                // Cancel the navigation in webview
+                decisionHandler(.cancel)
+                // Open in Safari
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                return
+            }
+
+            // Allow all other schemes (mailto, tel, etc.) to open externally
+            if navigationAction.navigationType == .linkActivated {
+                decisionHandler(.cancel)
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                return
+            }
+
+            decisionHandler(.allow)
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            // Ensure webview content fills the available space
+            let script = """
+                document.documentElement.style.minHeight = '100%';
+                document.body.style.minHeight = '100%';
+                document.body.style.display = 'flex';
+                document.body.style.flexDirection = 'column';
+            """
+            webView.evaluateJavaScript(script, completionHandler: nil)
         }
 
         func playAudioSequence(_ filenames: [String]) {

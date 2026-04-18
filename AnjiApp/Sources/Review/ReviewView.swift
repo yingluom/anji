@@ -148,9 +148,10 @@ struct ReviewView: View {
                     html: session.showingAnswer ? session.answerHTML : session.questionHTML,
                     templateCSS: session.templateCSS
                 )
-                .frame(minHeight: 100)
+                .frame(maxWidth: .infinity, minHeight: UIScreen.main.bounds.height * 0.5)
+                .frame(maxHeight: .infinity)
             }
-            .frame(maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             if session.showingAnswer {
                 ratingButtons
