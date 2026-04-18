@@ -93,18 +93,14 @@ workflows:
             ENABLE_BITCODE=NO \
             DEVELOPMENT_TEAM="" \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            2>&1 | tee build/xcodebuild.log
+            2>&1
 
-          RESULT=${PIPESTATUS[0]}
+          RESULT=$?
           echo "--- Archive took $(( $(date +%s) - START ))s ---"
 
           if [ $RESULT -ne 0 ]; then
             echo ""
-            echo "========== BUILD ERRORS =========="
-            grep -n "error:" build/xcodebuild.log | head -30
-            echo ""
-            echo "========== ERROR CONTEXT =========="
-            grep -B2 -A2 "error:" build/xcodebuild.log | head -80
+            echo "========== BUILD FAILED =========="
             echo "==================================="
             exit $RESULT
           fi
@@ -139,4 +135,3 @@ workflows:
 
     artifacts:
       - build/AnjiApp-unsigned.ipa
-      - build/xcodebuild.log

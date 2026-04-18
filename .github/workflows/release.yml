@@ -81,18 +81,14 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
             ENABLE_BITCODE=NO \
-            2>&1 | tee build/xcodebuild.log
+            2>&1
 
-          RESULT=${PIPESTATUS[0]}
+          RESULT=$?
           echo "--- Archive took $(( $(date +%s) - START ))s ---"
 
           if [ $RESULT -ne 0 ]; then
             echo ""
-            echo "========== BUILD ERRORS =========="
-            grep -n "error:" build/xcodebuild.log | head -30
-            echo ""
-            echo "========== ERROR CONTEXT =========="
-            grep -B2 -A2 "error:" build/xcodebuild.log | head -80
+            echo "========== BUILD FAILED =========="
             echo "==================================="
             exit $RESULT
           fi
@@ -122,10 +118,3 @@ jobs:
           path: build/AnjiApp-unsigned.ipa
           retention-days: 7
 
-      - name: Upload Build Log (manual run)
-        if: github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v4
-        with:
-          name: xcodebuild-log
-          path: build/xcodebuild.log
-          retention-days: 7
