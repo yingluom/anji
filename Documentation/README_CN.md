@@ -1,7 +1,7 @@
 # Anji
 
 <p align="center">
-  <img src="AnjiApp/Resources/Assets.xcassets/AppIcon.appiconset/icon_1024.png" width="128" height="128" alt="Anji 图标">
+  <img src="../AnjiApp/Resources/Assets.xcassets/AppIcon.appiconset/icon_1024.png" width="128" height="128" alt="Anji 图标">
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> | <a href="README_CN.md">简体中文</a> | <a href="README_JP.md">日本語</a>
+  <a href="../README.md">English</a> | <a href="README_CN.md">简体中文</a> | <a href="README_JP.md">日本語</a>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
   </a>
   <img src="https://img.shields.io/badge/iOS-18+-blue?logo=apple" alt="iOS 18+">
   <img src="https://img.shields.io/badge/Swift-6.0-orange?logo=swift" alt="Swift 6.0">
-  <a href="LICENSE">
+  <a href="../LICENSE">
     <img src="https://img.shields.io/badge/License-AGPL--3.0-green" alt="许可证">
   </a>
 </p>
@@ -196,7 +196,7 @@ brew install protobuf swift-protobuf xcodegen
 一条命令完成克隆、权限设置和构建：
 
 ```bash
-git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji && bash scripts/build-local.sh
+git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji && bash ../scripts/build-local.sh
 ```
 
 脚本自动处理 `chmod`、子模块初始化、依赖检查、Rust 编译、protobuf 生成、Xcode 项目配置、打包和 IPA 输出。
@@ -204,9 +204,9 @@ git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji &
 其他模式：
 
 ```bash
-bash scripts/build-local.sh --skip-rust  # 复用已有 XCFramework
-bash scripts/build-local.sh --sim        # 模拟器构建（快速迭代）
-bash scripts/build-local.sh --clean      # 清理所有产物后重建
+bash ../scripts/build-local.sh --skip-rust  # 复用已有 XCFramework
+bash ../scripts/build-local.sh --sim        # 模拟器构建（快速迭代）
+bash ../scripts/build-local.sh --clean      # 清理所有产物后重建
 ```
 
 构建日志保存在 `build/build.log`，失败时自动提取错误信息并显示文件路径和行号。输出 IPA 位于 `build/AnjiApp-unsigned.ipa`。
@@ -220,25 +220,25 @@ git clone --recurse-submodules https://github.com/yingluom/anji.git
 cd anji
 
 # 1. 编译 Rust XCFramework（真机 + 模拟器）
-./scripts/build-xcframework.sh
+./../scripts/build-xcframework.sh
 
 # 2. 从上游 .proto 文件生成 Swift protobuf 类型
-./scripts/generate-protos.sh
+./../scripts/generate-protos.sh
 
 # 3. 从 project.yml 生成 Xcode 项目
-cd AnjiApp && xcodegen generate && cd ..
+cd ../AnjiApp && xcodegen generate && cd ..
 
 # 4. 在 Xcode 中打开并构建
-open AnjiApp/AnjiApp.xcodeproj
+open ../AnjiApp/AnjiApp.xcodeproj
 ```
 
 ## 截图
 
 <p align="center">
-  <img src="screenshots/deck_list.png" width="200" alt="牌组列表">
-  <img src="screenshots/review_mode.png" width="200" alt="复习模式">
-  <img src="screenshots/card_editor.png" width="200" alt="卡片编辑器">
-  <img src="screenshots/statistics.png" width="200" alt="统计">
+  <img src="../screenshots/deck_list.png" width="200" alt="牌组列表">
+  <img src="../screenshots/review_mode.png" width="200" alt="复习模式">
+  <img src="../screenshots/card_editor.png" width="200" alt="卡片编辑器">
+  <img src="../screenshots/statistics.png" width="200" alt="统计">
 </p>
 
 > 注意：将截图添加到 `screenshots/` 文件夹

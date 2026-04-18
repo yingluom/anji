@@ -1,7 +1,7 @@
 # Anji
 
 <p align="center">
-  <img src="AnjiApp/Resources/Assets.xcassets/AppIcon.appiconset/icon_1024.png" width="128" height="128" alt="Anji アイコン">
+  <img src="../AnjiApp/Resources/Assets.xcassets/AppIcon.appiconset/icon_1024.png" width="128" height="128" alt="Anji アイコン">
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> | <a href="README_CN.md">简体中文</a> | <a href="README_JP.md">日本語</a>
+  <a href="../README.md">English</a> | <a href="README_CN.md">简体中文</a> | <a href="README_JP.md">日本語</a>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
   </a>
   <img src="https://img.shields.io/badge/iOS-18+-blue?logo=apple" alt="iOS 18+">
   <img src="https://img.shields.io/badge/Swift-6.0-orange?logo=swift" alt="Swift 6.0">
-  <a href="LICENSE">
+  <a href="../LICENSE">
     <img src="https://img.shields.io/badge/License-AGPL--3.0-green" alt="ライセンス">
   </a>
 </p>
@@ -137,10 +137,10 @@ PC は不要で、エンタープライズ証明書を使用します。
 ## スクリーンショット
 
 <p align="center">
-  <img src="screenshots/deck_list.png" width="200" alt="デッキリスト">
-  <img src="screenshots/review_mode.png" width="200" alt="復習モード">
-  <img src="screenshots/card_editor.png" width="200" alt="カードエディタ">
-  <img src="screenshots/statistics.png" width="200" alt="統計">
+  <img src="../screenshots/deck_list.png" width="200" alt="デッキリスト">
+  <img src="../screenshots/review_mode.png" width="200" alt="复習モード">
+  <img src="../screenshots/card_editor.png" width="200" alt="カードエディタ">
+  <img src="../screenshots/statistics.png" width="200" alt="統計">
 </p>
 
 > 注：`screenshots/` フォルダにスクリーンショットを追加してください
@@ -207,7 +207,7 @@ brew install protobuf swift-protobuf xcodegen
 クローン、パーミッション設定、ビルドを完了させるワンコマンド：
 
 ```bash
-git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji && bash scripts/build-local.sh
+git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji && bash ../scripts/build-local.sh
 ```
 
 このスクリプトは自動的に `chmod`、サブモジュールの初期化、依存関係チェック、Rust のコンパイル、protobuf の生成、Xcode プロジェクト設定、パッケージング、IPA の出力を処理します。
@@ -215,9 +215,9 @@ git clone --recurse-submodules https://github.com/yingluom/anji.git && cd anji &
 その他のモード：
 
 ```bash
-bash scripts/build-local.sh --skip-rust  # 既存の XCFramework を再利用
-bash scripts/build-local.sh --sim        # シミュレータービルド（迅速なイテレーション）
-bash scripts/build-local.sh --clean      # すべてのアーティファクトをクリーンしてから再ビルド
+bash ../scripts/build-local.sh --skip-rust  # 既存の XCFramework を再利用
+bash ../scripts/build-local.sh --sim        # シミュレータービルド（迅速なイテレーション）
+bash ../scripts/build-local.sh --clean      # すべてのアーティファクトをクリーンしてから再ビルド
 ```
 
 ビルドログは `build/build.log` に保存され、失敗時にはエラー情報とファイルパス、行番号が自動的に抽出されます。出力 IPA は `build/AnjiApp-unsigned.ipa` にあります。
@@ -231,16 +231,16 @@ git clone --recurse-submodules https://github.com/yingluom/anji.git
 cd anji
 
 # 1. Rust XCFramework をコンパイル（実機 + シミュレーター）
-./scripts/build-xcframework.sh
+./../scripts/build-xcframework.sh
 
 # 2. 上流の .proto ファイルから Swift protobuf 型を生成
-./scripts/generate-protos.sh
+./../scripts/generate-protos.sh
 
 # 3. project.yml から Xcode プロジェクトを生成
-cd AnjiApp && xcodegen generate && cd ..
+cd ../AnjiApp && xcodegen generate && cd ..
 
 # 4. Xcode で開いてビルド
-open AnjiApp/AnjiApp.xcodeproj
+open ../AnjiApp/AnjiApp.xcodeproj
 ```
 
 ## 継続的インテグレーション
