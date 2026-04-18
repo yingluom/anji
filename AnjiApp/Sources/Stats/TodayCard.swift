@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// Today overview card showing studied cards, time, and accuracy.
+/// Redesigned with better visual hierarchy like Anki desktop.
 struct TodayCard: View {
     let stats: TodayStats?
 
@@ -10,42 +11,58 @@ struct TodayCard: View {
                 .font(.headline)
 
             if let s = stats {
-                HStack(spacing: 24) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("\(s.studiedCards)")
-                            .font(.system(size: 32, weight: .bold))
-                        Text("stats.today.studied")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(s.formattedTime)
-                            .font(.system(size: 32, weight: .bold))
-                        Text("stats.today.time")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("\(Int(s.accuracy * 100))%")
-                            .font(.system(size: 32, weight: .bold))
-                        Text("stats.today.accuracy")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                // Main stats row - big numbers with labels
+                HStack(spacing: 0) {
+                    Spacer()
+                    StatColumn(
+                        value: "\(s.studiedCards)",
+                        label: String(localized: "stats.today.studied"),
+                        color: .primary
+                    )
+                    Spacer()
+                    Divider().frame(height: 40)
+                    Spacer()
+                    StatColumn(
+                        value: s.formattedTime,
+                        label: String(localized: "stats.today.time"),
+                        color: .primary
+                    )
+                    Spacer()
+                    if s.studiedCards > 0 {
+                        Divider().frame(height: 40)
+                        Spacer()
+                        StatColumn(
+                            value: "\(Int(s.accuracy * 100))%",
+                            label: String(localized: "stats.today.accuracy"),
+                            color: s.accuracy >= 0.9 ? .green : (s.accuracy >= 0.7 ? .orange : .red)
+                        )
+                        Spacer()
                     }
                 }
+                .padding(.vertical, 8)
 
-                HStack(spacing: 16) {
-                    Label("\(s.learnCount)", systemImage: "book.fill")
-                        .font(.caption)
-                        .foregroundStyle(Color.anjiTeal)
-                    Label("\(s.reviewCount)", systemImage: "arrow.clockwise")
-                        .font(.caption)
-                        .foregroundStyle(Color.anjiSuccess)
-                    Label("\(s.relearnCount)", systemImage: "exclamationmark.arrow.circlepath")
-                        .font(.caption)
-                        .foregroundStyle(Color.anjiWarning)
+                // Breakdown row - colored badges
+                HStack(spacing: 12) {
+                    Spacer()
+                    BreakdownBadge(
+                        count: s.learnCount,
+                        label: String(localized: "stats.legend.learn"),
+                        color: Color.anjiTeal,
+                        icon: "book.fill"
+                    )
+                    BreakdownBadge(
+                        count: s.reviewCount,
+                        label: String(localized: "stats.legend.review"),
+                        color: Color.anjiSuccess,
+                        icon: "arrow.clockwise"
+                    )
+                    BreakdownBadge(
+                        count: s.relearnCount,
+                        label: String(localized: "stats.legend.relearn"),
+                        color: Color.anjiWarning,
+                        icon: "exclamationmark.arrow.circlepath"
+                    )
+                    Spacer()
                 }
             } else {
                 ContentUnavailableView(
@@ -58,5 +75,45 @@ struct TodayCard: View {
         .padding()
         .background(Color.anjiSurface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+// MARK: - Helper Views
+
+private struct StatColumn: View {
+    let value: String
+    let label: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct BreakdownBadge: View {
+    let count: Int
+    let label: String
+    let color: Color
+    let icon: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption2)
+            Text("\(count)")
+                .font(.subheadline.weight(.semibold))
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(color.opacity(0.12))
+        .clipShape(Capsule())
     }
 }

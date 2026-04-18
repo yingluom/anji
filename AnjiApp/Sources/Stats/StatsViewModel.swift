@@ -16,6 +16,7 @@ final class StatsViewModel {
 
     // Parsed data
     var today: TodayStats?
+    var cardCounts: CardCountsData?
     var forecast: [ForecastPoint] = []
     var reviews: [ReviewPoint] = []
     var intervals: [IntervalPoint] = []
@@ -67,6 +68,19 @@ final class StatsViewModel {
                 learnCount: Int(t.learnCount),
                 reviewCount: Int(t.reviewCount),
                 relearnCount: Int(t.relearnCount)
+            )
+        }
+
+        // Card counts
+        if response.hasCardCounts {
+            let c = response.cardCounts.excludingInactive
+            cardCounts = CardCountsData(
+                newCards: Int(c.newCards),
+                learn: Int(c.learn),
+                young: Int(c.young),
+                mature: Int(c.mature),
+                suspended: Int(c.suspended),
+                buried: Int(c.buried)
             )
         }
 

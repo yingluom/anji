@@ -559,6 +559,60 @@
         "en": { "stringUnit": { "state": "translated", "value": "Review" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "复习" } }
       }
+    },
+    "stats.card_counts.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Card Types" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "卡片类型分布" } }
+      }
+    },
+    "stats.card_counts.new": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "New" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "新卡片" } }
+      }
+    },
+    "stats.card_counts.learn": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Learning" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "学习中" } }
+      }
+    },
+    "stats.card_counts.young": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Young" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "年轻" } }
+      }
+    },
+    "stats.card_counts.mature": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Mature" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "成熟" } }
+      }
+    },
+    "stats.card_counts.suspended": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Suspended" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已暂停" } }
+      }
+    },
+    "stats.card_counts.buried": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Buried" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已搁置" } }
+      }
+    },
+    "stats.card_counts.total": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Total" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "总计" } }
+      }
+    },
+    "stats.card_counts.placeholder": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No card data available" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无卡片数据" } }
+      }
     }
   }
 }
