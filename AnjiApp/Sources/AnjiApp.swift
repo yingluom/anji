@@ -3,6 +3,7 @@ import AnkiBackend
 import AnkiSync
 import Dependencies
 import Sharing
+import AVFoundation
 
 @main
 struct AnjiApp: App {
@@ -14,6 +15,16 @@ struct AnjiApp: App {
     @State private var pendingReviewDeckId: Int64? = nil
 
     init() {
+        // Configure audio session to allow mixing with other apps (background music)
+        // This must be done early before any audio playback
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            print("Failed to configure audio session: \(error)")
+        }
+
         // Apply language preference immediately (requires relaunch to fully take effect).
         LanguageManager.apply(preferredLanguage)
         try! prepareDependencies {

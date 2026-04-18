@@ -496,6 +496,19 @@ struct CardWebView: UIViewRepresentable {
 
         fileprivate func playNext() {
             guard !queue.isEmpty else { return }
+
+            // Ensure audio session is properly configured before each playback
+            // This maintains the .ambient + .mixWithOthers behavior
+            do {
+                let session = AVAudioSession.sharedInstance()
+                if session.category != .ambient {
+                    try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+                }
+                try session.setActive(true)
+            } catch {
+                print("Audio session configuration failed: \(error)")
+            }
+
             let url = queue.removeFirst()
             do {
                 let p = try AVAudioPlayer(contentsOf: url)
