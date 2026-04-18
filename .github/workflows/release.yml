@@ -37,6 +37,10 @@ jobs:
 
       - name: Build Archive
         run: |
+          rm -rf build/AnjiApp.xcarchive
+          echo "--- Starting xcodebuild archive ---"
+          START=$(date +%s)
+
           xcodebuild archive \
             -project AnjiApp/AnjiApp.xcodeproj \
             -scheme AnjiApp \
@@ -49,7 +53,22 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGNING_REQUIRED=NO \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
-            ENABLE_BITCODE=NO
+            ENABLE_BITCODE=NO \
+            2>&1 | tee build/xcodebuild.log
+
+          RESULT=${PIPESTATUS[0]}
+          echo "--- Archive took $(( $(date +%s) - START ))s ---"
+
+          if [ $RESULT -ne 0 ]; then
+            echo ""
+            echo "========== BUILD ERRORS =========="
+            grep -n "error:" build/xcodebuild.log | head -30
+            echo ""
+            echo "========== ERROR CONTEXT =========="
+            grep -B2 -A2 "error:" build/xcodebuild.log | head -80
+            echo "==================================="
+            exit $RESULT
+          fi
 
       - name: Package IPA
         run: |
@@ -68,9 +87,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Artifact (manual run)
+      - name: Upload IPA (manual run)
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: AnjiApp-unsigned
           path: build/AnjiApp-unsigned.ipa
+          retention-days: 7
+
+      - name: Upload Build Log (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: build/xcodebuild.log
+          retention-days: 7
