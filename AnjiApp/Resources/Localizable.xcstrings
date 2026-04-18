@@ -104,6 +104,12 @@
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "青绿" } }
       }
     },
+    "accent.black": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Black" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "黑色" } }
+      }
+    },
     "lang.system": {
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "System Default" } },

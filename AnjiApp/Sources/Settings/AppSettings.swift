@@ -25,10 +25,10 @@ enum AppTheme: String, CaseIterable, Sendable, Codable {
     }
 }
 
-/// Accent color preset — six curated choices.
+/// Accent color preset — seven curated choices.
 enum AccentPreset: String, CaseIterable, Sendable, Codable {
     case indigo  // default — matches legacy
-    case orange, green, blue, purple, pink, teal
+    case orange, green, blue, purple, pink, teal, black
 
     var titleKey: LocalizedStringKey {
         switch self {
@@ -39,6 +39,7 @@ enum AccentPreset: String, CaseIterable, Sendable, Codable {
         case .purple: "accent.purple"
         case .pink:   "accent.pink"
         case .teal:   "accent.teal"
+        case .black:  "accent.black"
         }
     }
 
@@ -52,6 +53,7 @@ enum AccentPreset: String, CaseIterable, Sendable, Codable {
         case .purple: (0xAF52DE, 0xBF5AF2)
         case .pink:   (0xFF2D55, 0xFF375F)
         case .teal:   (0x5AC8FA, 0x64D2FF)
+        case .black:  (0x000000, 0xFFFFFF)  // Pure black in light, white in dark for contrast
         }
     }
 

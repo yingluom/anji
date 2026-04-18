@@ -72,25 +72,33 @@ struct AboutSection: View {
         let now = Date()
         let timeSinceLastTap = now.timeIntervalSince(lastTapTime)
 
-        // Reset if taps are too slow (> 1.5 seconds between taps)
-        if timeSinceLastTap > 1.5 {
+        // Reset if taps are too slow (> 3 seconds between taps)
+        if timeSinceLastTap > 3.0 {
             versionTapCount = 0
         }
 
         versionTapCount += 1
         lastTapTime = now
 
+        // Haptic feedback on each tap
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+
         // Toggle debug mode on 8 consecutive taps
         if versionTapCount >= 8 {
             versionTapCount = 0
             debugUnlocked.toggle()
+
+            // Strong haptic feedback when unlocked
+            let successGenerator = UINotificationFeedbackGenerator()
+            successGenerator.notificationOccurred(debugUnlocked ? .success : .warning)
 
             withAnimation {
                 showDebugUnlocked = true
             }
 
             // Reset animation state after delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 showDebugUnlocked = false
             }
         }

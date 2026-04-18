@@ -65,6 +65,7 @@ final class ReviewSession {
     private var currentCard: QueuedReviewCard?
     private var cardStartTime: Date = .now
     private var lastRating: Rating?
+    private var lastCardId: Int64?
 
     init(deckId: Int64) { self.deckId = deckId }
 
@@ -85,6 +86,9 @@ final class ReviewSession {
         let elapsed = UInt32(Date.now.timeIntervalSince(cardStartTime) * 1000)
 
         do {
+            // Save current card ID before answering (for undo)
+            lastCardId = card.card.id
+            
             try scheduler.answerCard(card.card.id, rating, elapsed, card.states)
             stats.reviewed += 1
             if rating != .again { stats.correct += 1 }
@@ -106,18 +110,27 @@ final class ReviewSession {
             // Stop any playing audio first
             NotificationCenter.default.post(name: .init("AnjiStopAudio"), object: nil)
 
+            // Perform the undo operation
             try collection.undoLast()
-            canUndo = false
+            
+            // Update stats
             stats.reviewed -= 1
             if let r = lastRating, r != .again { stats.correct -= 1 }
+            
+            // Save the card ID we're trying to restore
+            let targetCardId = lastCardId
+            
+            // Reset undo state
+            canUndo = false
             lastRating = nil
+            lastCardId = nil
 
             // Reload queue to get the undone card back
             reloadQueue()
 
-            // Reset to show the first card (the undone one) as question
+            // Find and restore the undone card
             showingAnswer = false
-            advanceToNext()
+            restoreCard(targetCardId)
         } catch {
             // Silent fail - undo not available
         }
@@ -155,5 +168,24 @@ final class ReviewSession {
             answerHTML = questionHTML
             templateCSS = ""
         }
+    }
+
+    /// Restore a specific card by ID from the queue (used by undo)
+    private func restoreCard(_ cardId: Int64?) {
+        guard let targetId = cardId else {
+            // No target, just advance to next
+            advanceToNext()
+            return
+        }
+        
+        // Find the card in queue
+        if let index = cardQueue.firstIndex(where: { $0.card.id == targetId }) {
+            // Move the card to the front of the queue
+            let card = cardQueue.remove(at: index)
+            cardQueue.insert(card, at: 0)
+        }
+        
+        // Now show the first card (the undone one)
+        advanceToNext()
     }
 }
