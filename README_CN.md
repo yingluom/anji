@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> | <a href="README_CN.md">简体中文</a>
+  <a href="README.md">English</a> | <a href="README_CN.md">简体中文</a> | <a href="README_JP.md">日本語</a>
 </p>
 
 <p align="center">
@@ -45,21 +45,30 @@ Anji 提供完整的间隔重复学习功能：
 - 卡片浏览器：支持高级搜索查询，筛选和管理卡片
 - 自定义学习：创建筛选牌组进行专项复习
 - 标签管理：使用层级标签组织卡片
+- **智能卡片编辑器**：字段分类、标签管理、格式工具栏、多语言支持
 
 **学习界面**
 - 简洁无干扰的复习界面
 - 支持所有 Anki 卡片类型：标准、填空、输入答案等
 - 丰富的媒体支持：卡片内图片、音频、视频播放
 - 夜间模式和三种主题变体（浅色、深色、跟随系统）
+- **撤销/重做**：撤销上次的复习操作
+- **实时活动**：灵动岛与锁屏小组件支持（iOS 16.1+）
 
 **统计分析**
 - 今日概览：查看待复习卡片、已完成复习数、学习时长
 - 预测图表：可视化未来的复习工作量
 - 复习历史：追踪长期学习进度
 - 间隔与简易度图表：了解卡片难度分布
+- **10+ 统计卡片**：留存率、卡片数、连胜等
+- **可自定义主页**：选择显示在主页的统计卡片
+
+**每日灵感**
+- **每日一言**：支持开关，来自 Hitokoto/今日诗词 API
+- **多名言源**：可在不同名言源之间切换
 
 **本地化**
-- 完整的英文和简体中文界面
+- 完整的英文、简体中文、繁体中文、日语界面
 - 支持 RTL 语言的准备
 - 本地化的日期和数字格式
 
@@ -73,9 +82,17 @@ Anji 提供完整的间隔重复学习功能：
   </a>
 </p>
 
-- **最新版本**：https://github.com/yingluom/anji/releases/latest
-- **所有版本**：https://github.com/yingluom/anji/releases
-- **每日构建**：查看 [Codemagic](https://codemagic.io) CI 产物
+| 发布类型 | 链接 | 说明 |
+|---------|------|------|
+| **最新稳定版** | [Releases](https://github.com/yingluom/anji/releases/latest) | 生产就绪版本 |
+| **所有版本** | [Releases](https://github.com/yingluom/anji/releases) | 版本历史 |
+| **每日构建** | [Codemagic](https://codemagic.io) | 最新 CI 构建产物 |
+
+### 系统要求
+
+- iOS 18.0 或更高版本
+- iPhone 或 iPad
+- 约 200MB 可用空间
 
 ## 安装方法
 
@@ -83,14 +100,39 @@ Anji 提供完整的间隔重复学习功能：
 
 Anji 以未签名 IPA 形式分发。可使用以下任一工具安装：
 
-| 工具 | 费用 | 是否需要电脑 | 说明 |
-|------|------|-------------|------|
-| [SideStore](https://sidestore.io/) | 免费 | 仅需初次设置 | 推荐 - 设置后无需电脑 |
-| [Sideloadly](https://sideloadly.io/) | 免费 | 是 | 通过 USB 连接 |
-| [AltStore](https://altstore.io/) | 免费 | 是 | 流行的替代方案 |
-| ESign / Scarlet | 付费 | 否 | 使用开发者证书 |
+#### 1. SideStore（推荐 ⭐）
+最适合大多数用户，初始设置后无需电脑。
 
-[下载最新 IPA](https://github.com/yingluom/anji/releases/latest)
+1. 在设备上安装 [SideStore](https://sidestore.io/)
+2. 下载最新的 `AnjiApp-unsigned.ipa`
+3. 打开 SideStore → "我的应用" → "+" → 选择 IPA
+4. 使用 Apple ID 登录（免费开发者账号）
+
+#### 2. Sideloadly（免费，需要电脑）
+适合通过 USB 一次性安装。
+
+1. 下载 [Sideloadly](https://sideloadly.io/)（Windows/macOS）
+2. 通过 USB 连接设备
+3. 将 IPA 拖入 Sideloadly
+4. 输入 Apple ID 并安装
+
+#### 3. AltStore（免费，需要电脑）
+流行的替代方案，支持自动刷新。
+
+1. 在电脑上安装 [AltStore](https://altstore.io/)
+2. 连接设备并安装 AltStore
+3. 在设备上打开 AltStore → "我的应用" → "+"
+4. 选择下载的 IPA
+
+#### 4. ESign / Scarlet（付费证书）
+无需电脑，使用企业证书。
+
+| 工具 | 费用 | 电脑 | 自动刷新 | 说明 |
+|------|------|------|----------|------|
+| [SideStore](https://sidestore.io/) | 免费 | 仅需一次 | ✅ 7 天 | **推荐** |
+| [Sideloadly](https://sideloadly.io/) | 免费 | 总是需要 | ❌ 手动 | USB 安装简单 |
+| [AltStore](https://altstore.io/) | 免费 | 总是需要 | ✅ WiFi | 流行替代方案 |
+| ESign / Scarlet | 付费 | 否 | ✅ 1 年 | 使用证书 |
 
 ## 技术架构
 
@@ -190,6 +232,17 @@ cd AnjiApp && xcodegen generate && cd ..
 open AnjiApp/AnjiApp.xcodeproj
 ```
 
+## 截图
+
+<p align="center">
+  <img src="screenshots/deck_list.png" width="200" alt="牌组列表">
+  <img src="screenshots/review_mode.png" width="200" alt="复习模式">
+  <img src="screenshots/card_editor.png" width="200" alt="卡片编辑器">
+  <img src="screenshots/statistics.png" width="200" alt="统计">
+</p>
+
+> 注意：将截图添加到 `screenshots/` 文件夹
+
 ## 持续集成
 
 由 [Codemagic](https://codemagic.io) 提供自动化构建：
@@ -198,7 +251,7 @@ open AnjiApp/AnjiApp.xcodeproj
 - 产出未签名 IPA 文件
 - 运行单元测试和代码检查
 
-详见 [`codemagic.yaml`](codemagic.yaml) 配置。
+详见 [`codemagic.yaml`](codemagic.yaml) 和 [`.github/workflows/`](.github/workflows/) 配置。
 
 ## 许可证
 
@@ -208,11 +261,45 @@ open AnjiApp/AnjiApp.xcodeproj
 
 欢迎贡献代码！在提交 PR 之前，请先阅读我们的[贡献指南](CONTRIBUTING.md)。
 
+## 技术栈
+
+- **语言**：Swift 6.0
+- **UI 框架**：SwiftUI
+- **架构**：Swift Dependencies + Composable Architecture 模式
+- **后端**：Rust FFI（Anki rslib）
+- **同步协议**：AnkiWeb REST API
+- **CI/CD**：GitHub Actions + Codemagic
+
+## 参与贡献
+
+欢迎贡献代码！在提交 PR 之前，请先阅读我们的[贡献指南](CONTRIBUTING.md)。
+
+### 贡献者快速开始
+
+```bash
+# Fork 并克隆
+git clone --recurse-submodules https://github.com/YOUR_USERNAME/anji.git
+cd anji
+
+# 构建全部
+bash scripts/build-local.sh
+
+# 或在 Xcode 中开发
+cd AnjiApp && xcodegen generate && open AnjiApp.xcodeproj
+```
+
 ## 致谢
 
 - [Anki](https://apps.ankiweb.net/) by Damien Elmes - 原创的间隔重复软件
 - [ankitects/anki](https://github.com/ankitects/anki) - 官方 Anki Rust 后端
 - [PointFree](https://www.pointfree.co/) - 提供 swift-dependencies 和优秀的 Swift 库
+- [Swift Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture) - 架构灵感
+
+---
+
+<p align="center">
+  <sub>为全球学习者打造 ❤️</sub>
+</p>
 
 ---
 
