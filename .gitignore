@@ -1,39 +1,95 @@
-# === Xcode ===
+# ==============================================================================
+# ANJI PROJECT GITIGNORE
+# ==============================================================================
+
+# --- Xcode & Apple ---
+# ------------------------------------------------------------------------------
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
 DerivedData/
 build/
 *.ipa
 *.dSYM.zip
 *.dSYM
 *.hmap
-*.moved-aside
-*.xcuserstate
 IDEWorkspaceChecks.plist
+# xcframeworks should generally be ignored if they are build products
+AnkiRust.xcframework/
 
-# === Swift Package Manager ===
+# --- Swift Package Manager ---
+# ------------------------------------------------------------------------------
 .build/
 .swiftpm/xcode/
+.swiftpm/configuration/
 Packages/
+userdata/
 xcuserdata/
 
-# === Rust ===
+# --- Rust & Cargo ---
+# ------------------------------------------------------------------------------
 anki-bridge-rs/target/
+anki-bridge-rs/*.rs.bk
+anki-upstream/target/
+# If there are other Rust packages, broad ignore:
+**/target/
+**/*.rs.bk
 
-# === Generated Artifacts ===
-AnkiRust.xcframework/
+# --- Generated Source Files ---
+# ------------------------------------------------------------------------------
+# Ignore files generated from Protobuf
 Sources/AnkiProto/*.pb.swift
+# Ignore XcodeGen output if it's regenerated every time
+# *.xcodeproj/
 
-# === macOS ===
+# --- Operating Systems ---
+# ------------------------------------------------------------------------------
+# macOS
 .DS_Store
 ._*
+.Spotlight-V100
+.Trashes
 
-# === IDE ===
+# Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# --- IDEs & Editors ---
+# ------------------------------------------------------------------------------
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains (AppCode, CLion, etc.)
+.idea/
+
+# Text Editors
 *.swp
 *~
-.idea/
-.vscode/
+.netrwhist
 
-# === Local-only notes ===
-PROMPT.md
+# --- Environment & Scripts ---
+# ------------------------------------------------------------------------------
+.env
+.env.local
 *.log
+
+# --- Project Specific ---
+# ------------------------------------------------------------------------------
+# Privacy: Do not upload the user's personal prompt notes
+PROMPT.md
+Documentation/PROMPT.md
+
+# Build Artifacts in Documentation
+# (Preserve the folder but ignore IPA files inside)
+Documentation/Builds/*.ipa
+
+# ==============================================================================
