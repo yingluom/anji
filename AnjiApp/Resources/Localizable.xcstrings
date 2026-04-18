@@ -811,6 +811,134 @@
         "en": { "stringUnit": { "state": "translated", "value": "Select which statistics cards to display on the home screen." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "选择在主页显示哪些统计卡片。" } }
       }
+    },
+    "editor.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Edit Note" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "编辑笔记" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "編輯筆記" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "ノートを編集" } }
+      }
+    },
+    "editor.toolbar": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Formatting" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "格式工具" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "格式工具" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "書式設定" } }
+      }
+    },
+    "editor.tags": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Tags" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "标签" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "標籤" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "タグ" } }
+      }
+    },
+    "editor.tag.placeholder": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Add a tag..." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "添加标签..." } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "新增標籤..." } },
+        "ja": { "stringUnit": { "state": "translated", "value": "タグを追加..." } }
+      }
+    },
+    "editor.category.basic": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Basic Fields" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "基础字段" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "基礎欄位" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "基本フィールド" } }
+      }
+    },
+    "editor.category.vocab": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Vocabulary" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "词汇" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "詞彙" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "語彙" } }
+      }
+    },
+    "editor.category.sentence": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Sentences" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "例句" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "例句" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "例文" } }
+      }
+    },
+    "editor.category.audio": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Audio" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "音频" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "音訊" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "オーディオ" } }
+      }
+    },
+    "editor.category.media": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Media" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "媒体" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "媒體" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "メディア" } }
+      }
+    },
+    "editor.category.meta": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Metadata" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "元数据" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "元資料" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "メタデータ" } }
+      }
+    },
+    "editor.category.other": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Other" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "其他" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "其他" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "その他" } }
+      }
+    },
+    "editor.type.audio": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Audio" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "音频" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "音訊" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "オーディオ" } }
+      }
+    },
+    "editor.type.image": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Image" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "图片" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "圖片" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "画像" } }
+      }
+    },
+    "editor.type.japanese": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Japanese" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "日语" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "日語" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "日本語" } }
+      }
+    },
+    "editor.type.text": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Text" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "文本" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "文字" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "テキスト" } }
+      }
+    },
+    "editor.field.placeholder": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Enter content..." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "输入内容..." } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "輸入内容..." } },
+        "ja": { "stringUnit": { "state": "translated", "value": "内容を入力..." } }
+      }
     }
   }
 }
