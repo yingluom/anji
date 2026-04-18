@@ -114,6 +114,11 @@ extension SharedReaderKey where Self == AppStorageKey<Bool>.Default {
     static var mediaSyncEnabled: Self {
         Self[.appStorage("mediaSyncEnabled"), default: true]
     }
+
+    /// Enable Live Activity / Dynamic Island support during study.
+    static var liveActivityEnabled: Self {
+        Self[.appStorage("liveActivityEnabled"), default: true]
+    }
 }
 
 extension SharedReaderKey where Self == AppStorageKey<SyncMode>.Default {

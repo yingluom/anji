@@ -1,10 +1,12 @@
 import SwiftUI
 import AnkiKit
+import Sharing
 
 struct ReviewView: View {
     let deckId: Int64
     let onDismiss: () -> Void
     @Environment(\.anjiAccent) private var anjiAccent
+    @Shared(.liveActivityEnabled) private var liveActivityEnabled
 
     @State private var session: ReviewSession
 
@@ -48,7 +50,70 @@ struct ReviewView: View {
                 }
             }
         }
-        .task { session.start() }
+        .task {
+            session.start()
+            startLiveActivity()
+        }
+        .onChange(of: session.questionHTML) { _, _ in
+            updateLiveActivity()
+        }
+        .onChange(of: session.showingAnswer) { _, _ in
+            updateLiveActivity()
+        }
+        .onChange(of: session.remainingCounts) { _, _ in
+            updateLiveActivity()
+        }
+        .onDisappear {
+            endLiveActivity()
+        }
+    }
+
+    // MARK: - Live Activity
+
+    private func startLiveActivity() {
+        guard liveActivityEnabled,
+              #available(iOS 16.1, *) else { return }
+
+        // Get deck name from somewhere - for now use a placeholder
+        // In a real implementation, you'd get the deck name from the session or deck client
+        let deckName = "Study Session"
+
+        LiveActivityManager.shared.startActivity(
+            deckName: deckName,
+            cardFront: cleanHTML(session.questionHTML),
+            counts: session.remainingCounts,
+            totalReviewed: session.stats.reviewed
+        )
+    }
+
+    private func updateLiveActivity() {
+        guard liveActivityEnabled,
+              #available(iOS 16.1, *) else { return }
+
+        LiveActivityManager.shared.updateActivity(
+            cardFront: cleanHTML(session.questionHTML),
+            cardBack: cleanHTML(session.answerHTML),
+            showingAnswer: session.showingAnswer,
+            counts: session.remainingCounts,
+            totalReviewed: session.stats.reviewed
+        )
+    }
+
+    private func endLiveActivity() {
+        guard #available(iOS 16.1, *) else { return }
+        LiveActivityManager.shared.endActivity()
+    }
+
+    private func cleanHTML(_ html: String) -> String {
+        // Remove HTML tags and decode entities for Live Activity display
+        var text = html.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "&nbsp;", with: " ")
+        text = text.replacingOccurrences(of: "&lt;", with: "<")
+        text = text.replacingOccurrences(of: "&gt;", with: ">")
+        text = text.replacingOccurrences(of: "&amp;", with: "&")
+        text = text.replacingOccurrences(of: "&quot;", with: "\"")
+        text = text.replacingOccurrences(of: "&#39;", with: "'")
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     // MARK: - Card Area

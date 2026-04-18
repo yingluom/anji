@@ -637,6 +637,18 @@
         "en": { "stringUnit": { "state": "translated", "value": "Easy" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "简单" } }
       }
+    },
+    "settings.live_activity": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Dynamic Island" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "灵动岛显示" } }
+      }
+    },
+    "settings.advanced.footer.live_activity": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Shows study progress on Dynamic Island and Lock Screen when you leave the app. Tap the version number 8 times in About to access debug tools." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "退出应用时在灵动岛和锁定屏幕显示学习进度。在关于页面连点版本号8次可进入调试工具。" } }
+      }
     }
   }
 }
