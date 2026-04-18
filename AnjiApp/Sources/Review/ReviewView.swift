@@ -131,30 +131,71 @@ struct ReviewView: View {
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
-    private func ratingButton(_ rating: Rating, color: Color) -> some View {
-        Button { session.answer(rating: rating) } label: {
-            VStack(spacing: 4) {
-                Text(session.nextIntervals[rating] ?? "")
-                    .font(.system(size: 12, weight: .medium))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                Text(rating.label)
-                    .font(.system(size: 15, weight: .semibold))
+    private struct RatingButton: View {
+        let rating: Rating
+        let color: Color
+        let interval: String
+        let action: () -> Void
+
+        @State private var isPressed = false
+
+        var body: some View {
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    action()
+                }
+            } label: {
+                VStack(spacing: 4) {
+                    Text(interval)
+                        .font(.system(size: 12, weight: .medium))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Text(rating.label)
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .padding(.horizontal, 8)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .padding(.horizontal, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(color.opacity(isPressed ? 0.6 : 0.3), lineWidth: isPressed ? 2 : 1)
+                    )
+                    .shadow(
+                        color: color.opacity(isPressed ? 0.2 : 0),
+                        radius: isPressed ? 8 : 0,
+                        x: 0,
+                        y: isPressed ? 4 : 0
+                    )
+            )
+            .foregroundStyle(color)
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: isPressed)
+            .buttonStyle(RatingButtonStyle(isPressed: $isPressed))
         }
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(color.opacity(0.3), lineWidth: 1)
-                )
+    }
+
+    private struct RatingButtonStyle: ButtonStyle {
+        @Binding var isPressed: Bool
+
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .onChange(of: configuration.isPressed) { _, newValue in
+                    isPressed = newValue
+                }
+        }
+    }
+
+    private func ratingButton(_ rating: Rating, color: Color) -> some View {
+        RatingButton(
+            rating: rating,
+            color: color,
+            interval: session.nextIntervals[rating] ?? "",
+            action: { session.answer(rating: rating) }
         )
-        .foregroundStyle(color)
-        .buttonStyle(.plain)
     }
 
     // MARK: - Completion

@@ -613,6 +613,30 @@
         "en": { "stringUnit": { "state": "translated", "value": "No card data available" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无卡片数据" } }
       }
+    },
+    "rating.again": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Again" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "忘记" } }
+      }
+    },
+    "rating.hard": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Hard" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "困难" } }
+      }
+    },
+    "rating.good": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Good" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "良好" } }
+      }
+    },
+    "rating.easy": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Easy" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "简单" } }
+      }
     }
   }
 }
