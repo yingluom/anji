@@ -31,53 +31,35 @@ struct DailyQuoteView: View {
     @State private var error: Error?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "quote.opening")
-                    .font(.title3)
-                    .foregroundStyle(anjiAccent.gradient)
-                
-                Spacer()
-                
-                Button {
-                    fetchQuote()
-                } label: {
-                    if isLoading {
-                        ProgressView()
-                            .scaleEffect(0.6)
-                            .frame(width: 20, height: 20)
-                    } else {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.caption)
-                            .foregroundStyle(Color.anjiTertiary)
-                    }
-                }
-                .buttonStyle(.plain)
-                .disabled(isLoading)
-            }
-            
+        HStack(spacing: 10) {
+            // Small quote icon
+            Image(systemName: "quote.bubble")
+                .font(.system(size: 12))
+                .foregroundStyle(anjiAccent)
+                .frame(width: 24, height: 24)
+                .background(anjiAccent.opacity(0.1))
+                .clipShape(Circle())
+
+            // Quote content
             if isLoading && quote == nil {
-                VStack(alignment: .leading, spacing: 8) {
-                    RoundedRectangle(cornerRadius: 4)
+                VStack(alignment: .leading, spacing: 4) {
+                    RoundedRectangle(cornerRadius: 2)
                         .fill(Color.anjiTertiary.opacity(0.3))
-                        .frame(height: 16)
-                    RoundedRectangle(cornerRadius: 4)
+                        .frame(height: 10)
+                    RoundedRectangle(cornerRadius: 2)
                         .fill(Color.anjiTertiary.opacity(0.3))
-                        .frame(width: 200, height: 16)
+                        .frame(width: 120, height: 10)
                 }
-                .padding(.vertical, 8)
             } else if let q = quote {
-                Text(q.hitokoto)
-                    .font(.system(size: 16, weight: .medium, design: .serif))
-                    .foregroundStyle(Color.anjiPrimary)
-                    .lineSpacing(4)
-                    .multilineTextAlignment(.leading)
-                
-                HStack {
-                    Spacer()
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(q.hitokoto)
+                        .font(.system(size: 13, design: .default))
+                        .foregroundStyle(Color.anjiPrimary)
+                        .lineLimit(1)
+
                     Text("— \(q.author)")
-                        .font(.caption)
-                        .foregroundStyle(Color.anjiSecondary)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.anjiTertiary)
                 }
             } else if error != nil {
                 Text("quote.load_error")
@@ -85,14 +67,34 @@ struct DailyQuoteView: View {
                     .foregroundStyle(Color.anjiSecondary)
                     .onTapGesture { fetchQuote() }
             }
+
+            Spacer()
+
+            // Refresh button
+            Button {
+                fetchQuote()
+            } label: {
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(0.5)
+                        .frame(width: 16, height: 16)
+                } else {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.anjiTertiary)
+                }
+            }
+            .buttonStyle(.plain)
+            .disabled(isLoading)
         }
-        .padding()
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(anjiAccent.opacity(0.2), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(anjiAccent.opacity(0.15), lineWidth: 0.5)
                 )
         )
         .onAppear {
