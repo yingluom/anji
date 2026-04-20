@@ -296,6 +296,12 @@ struct ButtonsStats {
     var easyTotal: Int { Int(learning[3]) + Int(young[3]) + Int(mature[3]) }
 }
 
+struct DifficultyPoint: Identifiable {
+    let id = UUID()
+    let difficulty: Double // 0-100%
+    let count: Int
+}
+
 struct RetrievabilityPoint: Identifiable {
     let id = UUID()
     let retrievabilityPercent: Double // 0-100%

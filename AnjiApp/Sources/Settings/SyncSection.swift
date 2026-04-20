@@ -52,7 +52,7 @@ struct SyncSection: View {
 
             // Sync interval picker (only when auto sync is on)
             if autoSync {
-                Picker(selection: $syncIntervalMinutes) {
+                Picker(selection: Binding($syncIntervalMinutes)) {
                     Text("Manual only").tag(0)
                     Text("Every 15 min").tag(15)
                     Text("Every 30 min").tag(30)

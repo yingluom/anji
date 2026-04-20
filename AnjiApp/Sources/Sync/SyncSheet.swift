@@ -533,7 +533,7 @@ extension SyncSheet {
 
         syncLogs.removeAll()
         mediaProgress = .init()
-        lastSyncStatus = "inProgress"
+        $lastSyncStatus.withLock { $0 = "inProgress" }
 
         state = .syncing("Syncing collection...")
         addLog("Connecting to AnkiWeb...")
@@ -570,8 +570,9 @@ extension SyncSheet {
             isMediaSyncActive = false
 
             // Record successful sync
-            lastSyncTime = ISO8601DateFormatter().string(from: Date())
-            lastSyncStatus = "success"
+            let now = ISO8601DateFormatter().string(from: Date())
+            $lastSyncTime.withLock { $0 = now }
+            $lastSyncStatus.withLock { $0 = "success" }
 
             state = .success(summary)
         } catch let e as SyncError where e == .authFailed {
@@ -580,8 +581,9 @@ extension SyncSheet {
             state = .needsFullSync
         } catch {
             addLog("Sync failed: \(error.localizedDescription)")
-            lastSyncTime = ISO8601DateFormatter().string(from: Date())
-            lastSyncStatus = "failed"
+            let now = ISO8601DateFormatter().string(from: Date())
+            $lastSyncTime.withLock { $0 = now }
+            $lastSyncStatus.withLock { $0 = "failed" }
             state = .error(error.localizedDescription)
         }
     }
