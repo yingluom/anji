@@ -43,10 +43,20 @@ struct ReviewView: View {
                     Button("common.done") { onDismiss() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { session.undo() } label: {
-                        Image(systemName: "arrow.uturn.backward")
+                    HStack(spacing: 12) {
+                        Button {
+                            // Replay audio for current card
+                            NotificationCenter.default.post(name: .init("AnjiReplayAudio"), object: nil)
+                        } label: {
+                            Image(systemName: "speaker.wave.2.fill")
+                        }
+                        .disabled(session.isFinished)
+
+                        Button { session.undo() } label: {
+                            Image(systemName: "arrow.uturn.backward")
+                        }
+                        .disabled(!session.canUndo)
                     }
-                    .disabled(!session.canUndo)
                 }
             }
         }
@@ -120,29 +130,6 @@ struct ReviewView: View {
 
     private var cardArea: some View {
         VStack(spacing: 0) {
-            // Card type indicator
-            HStack {
-                Spacer()
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(session.currentCardType.color)
-                        .frame(width: 8, height: 8)
-                    Text(session.currentCardType.label)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(session.currentCardType.color)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(session.currentCardType.color.opacity(0.12))
-                )
-                Spacer()
-            }
-            .padding(.top, 8)
-            .padding(.bottom, 4)
-
             CardWebView(
                 html: session.showingAnswer ? session.answerHTML : session.questionHTML,
                 templateCSS: session.templateCSS
@@ -152,182 +139,65 @@ struct ReviewView: View {
             if session.showingAnswer {
                 ratingButtons
             } else {
-                HStack {
-                    Spacer()
-                    Button {
-                        withAnimation(.easeOut(duration: 0.2)) { session.revealAnswer() }
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "eye.fill")
-                                .font(.system(size: 16, weight: .semibold))
-                            Text("review.show_answer")
-                                .font(.system(size: 16, weight: .semibold))
-                        }
-                        .padding(.horizontal, 32)
-                        .padding(.vertical, 14)
-                    }
-                    .background(
-                        ZStack {
-                            // Base glass layer
-                            Capsule()
-                                .fill(.ultraThinMaterial)
-                            
-                            // Gradient overlay
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            anjiAccent.opacity(0.25),
-                                            anjiAccent.opacity(0.1)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                            
-                            // Inner highlight
-                            Capsule()
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            .white.opacity(0.5),
-                                            .white.opacity(0.2)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottom
-                                    ),
-                                    lineWidth: 1
-                                )
-                            
-                            // Outer border
-                            Capsule()
-                                .stroke(anjiAccent.opacity(0.4), lineWidth: 1.5)
-                        }
-                        .shadow(
-                            color: anjiAccent.opacity(0.25),
-                            radius: 8,
-                            x: 0,
-                            y: 4
-                        )
-                    )
-                    .foregroundStyle(anjiAccent)
-                    .buttonStyle(.plain)
-                    Spacer()
-                }
-                .padding(.vertical, 16)
+                showAnswerButton
             }
         }
     }
 
-    // MARK: - Rating Buttons
+    // MARK: - Show Answer
+
+    private var showAnswerButton: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.2)) { session.revealAnswer() }
+        } label: {
+            Text("review.show_answer")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+        }
+        .background(Color.accentColor)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+
+    // MARK: - Rating Buttons (Anki iOS style)
 
     private var ratingButtons: some View {
-        HStack(spacing: Spacing.sm) {
+        HStack(spacing: 8) {
             ratingButton(.again, color: .anjiAgain)
             ratingButton(.hard,  color: .anjiHard)
             ratingButton(.good,  color: .anjiGood)
             ratingButton(.easy,  color: .anjiEasy)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
-    private struct RatingButton: View {
-        let rating: Rating
-        let color: Color
-        let interval: String
-        let action: () -> Void
-
-        @State private var isPressed = false
-
-        var body: some View {
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                    action()
-                }
-            } label: {
-                VStack(spacing: 2) {
-                    Text(interval)
-                        .font(.system(size: 11, weight: .medium))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                    Text(rating.label)
-                        .font(.system(size: 14, weight: .semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 4)
-            }
-            .background(
-                ZStack {
-                    // Base glass layer
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(.ultraThinMaterial)
-                    
-                    // Gradient overlay for depth
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    color.opacity(0.15),
-                                    color.opacity(0.05)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                    
-                    // Inner highlight
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    .white.opacity(0.4),
-                                    .white.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 1
-                        )
-                    
-                    // Outer border with color
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(color.opacity(isPressed ? 0.5 : 0.25), lineWidth: isPressed ? 2 : 1)
-                }
-                .shadow(
-                    color: color.opacity(isPressed ? 0.3 : 0.15),
-                    radius: isPressed ? 12 : 6,
-                    x: 0,
-                    y: isPressed ? 6 : 2
-                )
-            )
-            .foregroundStyle(color)
-            .scaleEffect(isPressed ? 0.92 : 1.0)
-            .animation(.easeInOut(duration: 0.12), value: isPressed)
-            .buttonStyle(RatingButtonStyle(isPressed: $isPressed))
-        }
-    }
-
-    private struct RatingButtonStyle: ButtonStyle {
-        @Binding var isPressed: Bool
-
-        func makeBody(configuration: Configuration) -> some View {
-            configuration.label
-                .onChange(of: configuration.isPressed) { _, newValue in
-                    isPressed = newValue
-                }
-        }
-    }
-
     private func ratingButton(_ rating: Rating, color: Color) -> some View {
-        RatingButton(
-            rating: rating,
-            color: color,
-            interval: session.nextIntervals[rating] ?? "",
-            action: { session.answer(rating: rating) }
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                session.answer(rating: rating)
+            }
+        } label: {
+            VStack(spacing: 2) {
+                Text(session.nextIntervals[rating] ?? "")
+                    .font(.system(size: 12, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Text(rating.label)
+                    .font(.system(size: 15, weight: .bold))
+            }
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(color)
         )
+        .buttonStyle(.plain)
     }
 
     // MARK: - Completion

@@ -945,6 +945,72 @@
         "zh-Hant": { "stringUnit": { "state": "translated", "value": "輸入内容..." } },
         "ja": { "stringUnit": { "state": "translated", "value": "内容を入力..." } }
       }
+    },
+    "settings.sync_interval": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Sync Interval" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "同步间隔" } }
+      }
+    },
+    "settings.sync_interval.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Automatically sync on a schedule when the app is open." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "应用打开时按计划自动同步。" } }
+      }
+    },
+    "settings.background_sync": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Background Sync" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "后台同步" } }
+      }
+    },
+    "settings.background_sync.footer": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Sync continues in the background when the app is not in use. Requires background app refresh permission." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "应用不在使用时在后台继续同步。需要后台应用刷新权限。" } }
+      }
+    },
+    "stats.added.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Added" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "新增卡片" } }
+      }
+    },
+    "stats.added.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No added card data" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无新增卡片数据" } }
+      }
+    },
+    "stats.added.avg_per_day": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Avg per day:" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "平均每天:" } }
+      }
+    },
+    "stats.buttons.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Answer Buttons" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "答案按钮" } }
+      }
+    },
+    "stats.buttons.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No answer button data" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无按钮数据" } }
+      }
+    },
+    "stats.retrievability.title": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Retrievability" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "可提取性" } }
+      }
+    },
+    "stats.retrievability.empty": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No retrievability data (FSRS required)" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无可提取性数据 (需要FSRS)" } }
+      }
     }
   }
 }

@@ -17,17 +17,18 @@ final class StatsViewModel {
     // Parsed data
     var today: TodayStats?
     var cardCounts: CardCountsData?
+    var addedCards: [AddedPoint] = []
     var forecast: [ForecastPoint] = []
     var reviews: [ReviewPoint] = []
     var intervals: [IntervalPoint] = []
     var eases: [EasePoint] = []
-    
+
     // New stats
     var hourlyData: [HourlyPoint] = []
     var stabilityData: [StabilityPoint] = []
-    var difficultyData: [DifficultyPoint] = []
     var retrievabilityData: [RetrievabilityPoint] = []
     var trueRetention: TrueRetentionStats?
+    var buttonsData: ButtonsStats?
 
     var selectedRange: StatsRange = .oneMonth
 
@@ -114,11 +115,34 @@ final class StatsViewModel {
             IntervalPoint(intervalDays: Int($0.key), count: Int($0.value))
         }
 
+        // Added cards over time
+        if response.hasAdded {
+            addedCards = response.added.added.sorted { $0.key < $1.key }.map {
+                AddedPoint(dayOffset: Int($0.key), count: Int($0.value))
+            }
+        }
+
         // Ease (per-mille, 2500 = 250% but Anki stores as per-mille)
         eases = response.eases.eases.sorted { $0.key < $1.key }.map {
             EasePoint(easePercent: Double($0.key) / 10.0, count: Int($0.value))
         }
-        
+
+        // Buttons (Answer button distribution)
+        if response.hasButtons {
+            let buttonCounts: Anki_Stats_GraphsResponse.Buttons.ButtonCounts
+            switch selectedRange {
+            case .oneMonth: buttonCounts = response.buttons.oneMonth
+            case .threeMonths: buttonCounts = response.buttons.threeMonths
+            case .oneYear: buttonCounts = response.buttons.oneYear
+            case .allTime: buttonCounts = response.buttons.allTime
+            }
+            buttonsData = ButtonsStats(
+                learning: Array(buttonCounts.learning),
+                young: Array(buttonCounts.young),
+                mature: Array(buttonCounts.mature)
+            )
+        }
+
         // Hourly distribution (use selected range)
         if response.hasHours {
             let hoursData: [Anki_Stats_GraphsResponse.Hours.Hour]
@@ -137,13 +161,6 @@ final class StatsViewModel {
         if response.hasStability {
             stabilityData = response.stability.intervals.sorted { $0.key < $1.key }.map {
                 StabilityPoint(stabilityDays: Int($0.key), count: Int($0.value))
-            }
-        }
-        
-        // Difficulty distribution (FSRS only)
-        if response.hasDifficulty {
-            difficultyData = response.difficulty.eases.sorted { $0.key < $1.key }.map {
-                DifficultyPoint(difficulty: Double($0.key) / 10.0, count: Int($0.value))
             }
         }
         
@@ -255,10 +272,28 @@ struct StabilityPoint: Identifiable {
     let count: Int
 }
 
-struct DifficultyPoint: Identifiable {
+struct AddedPoint: Identifiable {
     let id = UUID()
-    let difficulty: Double // 0-100%
+    let dayOffset: Int
     let count: Int
+    var date: Date {
+        Calendar.current.date(byAdding: .day, value: dayOffset, to: Date()) ?? Date()
+    }
+}
+
+struct ButtonsStats {
+    let learning: [UInt32] // 4 elements for buttons 1-4
+    let young: [UInt32]
+    let mature: [UInt32]
+
+    var learningTotal: Int { learning.reduce(0) { $0 + Int($1) } }
+    var youngTotal: Int { young.reduce(0) { $0 + Int($1) } }
+    var matureTotal: Int { mature.reduce(0) { $0 + Int($1) } }
+
+    var againTotal: Int { Int(learning[0]) + Int(young[0]) + Int(mature[0]) }
+    var hardTotal: Int { Int(learning[1]) + Int(young[1]) + Int(mature[1]) }
+    var goodTotal: Int { Int(learning[2]) + Int(young[2]) + Int(mature[2]) }
+    var easyTotal: Int { Int(learning[3]) + Int(young[3]) + Int(mature[3]) }
 }
 
 struct RetrievabilityPoint: Identifiable {

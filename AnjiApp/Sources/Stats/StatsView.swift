@@ -31,16 +31,18 @@ struct StatsView: View {
                         Task { await viewModel.load() }
                     }
 
-                    // Chart cards
+                    // Chart cards - ordered like Anki desktop
                     VStack(spacing: Spacing.md) {
                         TodayCard(stats: viewModel.today)
                         CardCountsCard(counts: viewModel.cardCounts)
+                        AddedCard(data: viewModel.addedCards)
                         RetentionCard(stats: viewModel.trueRetention)
                         HourlyCard(data: viewModel.hourlyData)
                         StabilityCard(data: viewModel.stabilityData)
-                        DifficultyCard(data: viewModel.difficultyData)
+                        RetrievabilityCard(data: viewModel.retrievabilityData)
                         ForecastCard(data: viewModel.forecast)
                         ReviewsCard(data: viewModel.reviews)
+                        ButtonsCard(data: viewModel.buttonsData, range: viewModel.selectedRange)
                         IntervalsCard(data: viewModel.intervals)
                         EaseCard(data: viewModel.eases)
                     }

@@ -111,259 +111,211 @@ struct CardWebView: UIViewRepresentable {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <style>
-            /* Base reset */
+            /* === Base Reset === */
             html { -webkit-text-size-adjust: 100%; }
             * { box-sizing: border-box; }
-            html, body { margin: 0; padding: 0; background: transparent; }
 
-            /*
-             * Font stack that allows card template CSS to override.
-             * Card templates often use custom fonts via @font-face or system fonts.
-             * We provide a comprehensive fallback stack for CJK and other scripts.
-             */
+            /* Anki-standard card background — warm off-white like desktop/AnkiMobile */
+            html, body {
+                margin: 0; padding: 0;
+                background: #FFFAF0;
+                min-height: 100%; height: 100%;
+            }
+
             body {
-                /* Default iOS system fonts, but card CSS can override via .card class */
-                font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+                             "Hiragino Kaku Gothic ProN", "PingFang SC", "Noto Sans CJK JP",
+                             "SF Pro", "Helvetica Neue", Arial, sans-serif;
                 font-size: 20px;
                 line-height: 1.7;
-                padding: 20px;
+                padding: 16px 20px;
                 color: #1a1a2e;
                 word-wrap: break-word;
-                -webkit-text-size-adjust: 100%;
-                /* Allow font smoothing like desktop */
                 -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
             }
 
-            /*
-             * The .card class is what Anki templates use.
-             * We set a more comprehensive font stack here that includes CJK fonts.
-             * Card template CSS can still override this.
-             */
+            /* .card — Anki templates target this class */
             .card {
-                background: transparent;
-                color: inherit;
-                /* Comprehensive font stack matching Anki desktop behavior */
                 font-family: inherit;
+                color: inherit;
+                word-break: break-word;
+                overflow-x: hidden;
             }
 
-            /* Support for card templates that explicitly set font-family */
-            .card[style*="font-family"] {
-                /* Keep the inline style font */
-            }
-
-            /* CJK Font Support - Common fonts used in Anki templates */
+            /* === CJK Font Support === */
             :lang(zh), :lang(zh-CN), :lang(zh-TW), :lang(zh-HK), .chinese {
-                font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", "Noto Sans CJK SC", sans-serif;
+                font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
             }
             :lang(ja), :lang(jp), .japanese {
-                font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+                font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP", sans-serif;
             }
             :lang(ko), :lang(kr), .korean {
-                font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Nanum Gothic", sans-serif;
+                font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
             }
 
-            /* Allow @font-face from card template CSS to work */
-            @font-face {
-                font-display: swap;
+            /* === Ruby / Furigana === */
+            ruby { ruby-align: center; }
+            ruby rt {
+                font-size: 0.5em;
+                line-height: 1;
+                color: inherit;
             }
 
-            /* Light mode colors */
+            /* === Cloze === */
             .cloze { color: #007AFF; font-weight: 600; }
             .cloze-inactive { color: #6c757d; font-weight: 600; }
 
-            /* Type comparison styles */
+            /* === Type-in answer === */
             .typeGood, .typeGood a { color: #34C759; }
             .typeBad, .typeBad a { color: #FF3B30; }
             .typeMissed, .typeMissed a { color: #FF9500; }
-
-            /* Input field styling for type-in-answer */
             input[type="text"], textarea {
-                font-family: inherit;
-                font-size: 18px;
+                font-family: inherit; font-size: 18px;
                 padding: 8px 12px;
                 border: 1px solid rgba(128,128,128,0.4);
                 border-radius: 8px;
                 background: rgba(255,255,255,0.8);
-                color: inherit;
-                width: 100%;
-                max-width: 300px;
+                color: inherit; width: 100%; max-width: 300px;
             }
             input[type="text"]:focus, textarea:focus {
-                outline: none;
-                border-color: #007AFF;
+                outline: none; border-color: #007AFF;
             }
 
-            /* Media elements */
-            img, video { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 8px auto; }
-            hr { border: none; border-top: 1px solid rgba(0,0,0,0.15); margin: 16px 0; }
-            audio {
-                width: 100%;
-                margin: 12px 0;
-                min-height: 44px;
-                display: block;
-            }
-            /* Ensure audio controls are visible */
-            audio::-webkit-media-controls {
-                display: flex !important;
-            }
-            audio::-webkit-media-controls-panel {
-                background: rgba(128,128,128,0.1);
-                border-radius: 8px;
+            /* === Media Elements === */
+            img, video {
+                max-width: 100%; height: auto;
+                display: block; margin: 8px auto;
             }
 
-            /* Tables */
+            /* Hide native <audio> elements — we replace them with play buttons */
+            audio { display: none !important; }
+
+            /* Anki-style circular play button (injected by JS) */
+            .anki-play-btn {
+                display: inline-flex;
+                align-items: center; justify-content: center;
+                width: 36px; height: 36px;
+                border-radius: 50%;
+                border: 2px solid #333;
+                background: transparent;
+                cursor: pointer;
+                vertical-align: middle;
+                margin: 0 4px;
+                padding: 0;
+                -webkit-tap-highlight-color: transparent;
+                flex-shrink: 0;
+            }
+            .anki-play-btn:active { opacity: 0.5; }
+            .anki-play-btn svg {
+                width: 16px; height: 16px;
+                fill: #333;
+            }
+
+            /* === Separator === */
+            hr {
+                border: none;
+                border-top: 1px solid rgba(0,0,0,0.15);
+                margin: 16px 0;
+            }
+
+            /* === Tables === */
             table { border-collapse: collapse; margin: 8px 0; width: 100%; }
             td, th { border: 1px solid rgba(128,128,128,0.3); padding: 6px 10px; text-align: left; }
 
-            /* Code blocks */
+            /* === Code === */
             code, pre {
-                font-family: ui-monospace, "SF Mono", Menlo, "Cascadia Code", monospace;
+                font-family: ui-monospace, "SF Mono", Menlo, monospace;
                 background: rgba(128,128,128,0.12);
-                padding: 2px 6px;
-                border-radius: 4px;
+                padding: 2px 6px; border-radius: 4px;
                 font-size: 0.9em;
             }
             pre { padding: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
 
-            /* Links */
+            /* === Links === */
             a { color: #007AFF; text-decoration: none; }
-            a:hover { text-decoration: underline; }
+            a:active { opacity: 0.7; }
 
-            /* Dark mode support */
+            /* === Blockquotes === */
+            blockquote {
+                border-left: 4px solid rgba(128,128,128,0.3);
+                margin: 8px 0; padding-left: 16px; color: inherit;
+            }
+
+            /* === Lists === */
+            ul, ol { padding-left: 24px; }
+            li { margin: 4px 0; }
+
+            /* === MathJax === */
+            .math, .MathJax { font-size: 1em; }
+
+            /* === Mark / Highlight === */
+            mark { background: rgba(255, 214, 165, 0.5); padding: 1px 4px; border-radius: 3px; }
+
+            /* === Helpers === */
+            .hidden { display: none !important; }
+            .center { text-align: center; }
+            .left { text-align: left; }
+            .right { text-align: right; }
+            .card * { max-width: 100%; }
+
+            /* === Anki standard template classes === */
+            #qa { font-size: 1.2em; line-height: 1.6; }
+            .qacontainer { width: 100%; }
+            .extra, .info, .tags {
+                margin-top: 12px; padding-top: 12px;
+                border-top: 1px solid rgba(128,128,128,0.2);
+            }
+            .deck, .subdeck { font-size: 0.9em; color: rgba(128,128,128,0.7); margin-bottom: 8px; }
+            .answer { font-weight: 600; }
+
+            /* Two-column layouts */
+            .container, .row { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+            .col, .col-left, .col-right { flex: 1 1 45%; min-width: 140px; }
+
+            /* Floats */
+            .clearfix::after { content: ""; display: table; clear: both; }
+
+            /* === Night / Dark Mode === */
+            .nightMode, .night_mode { color: #e8e8e8 !important; }
+            .nightMode .cloze, .night_mode .cloze { color: #5AC8FA; }
+
             @media (prefers-color-scheme: dark) {
-                body { color: #e8e8e8; }
+                html, body { background: #1c1c1e; color: #e8e8e8; }
                 hr { border-top-color: rgba(255,255,255,0.2) !important; }
                 .cloze { color: #5AC8FA; }
-                .cloze-inactive { color: #8e8e93; }
+                .anki-play-btn { border-color: #e8e8e8; }
+                .anki-play-btn svg { fill: #e8e8e8; }
                 input[type="text"], textarea {
                     background: rgba(30,30,30,0.8);
                     border-color: rgba(255,255,255,0.2);
                     color: #e8e8e8;
                 }
-                input[type="text"]:focus, textarea:focus {
-                    border-color: #5AC8FA;
-                }
-            }
-
-            /* Legacy Anki night mode classes */
-            .nightMode, .night_mode {
-                color: #e8e8e8 !important;
-            }
-            .nightMode .cloze, .night_mode .cloze { color: #5AC8FA; }
-            .nightMode .cloze-inactive, .night_mode .cloze-inactive { color: #8e8e93; }
-
-            /* Blockquotes */
-            blockquote {
-                border-left: 4px solid rgba(128,128,128,0.3);
-                margin: 8px 0;
-                padding-left: 16px;
-                color: inherit;
-            }
-
-            /* Lists */
-            ul, ol { padding-left: 24px; }
-            li { margin: 4px 0; }
-
-            /* MathJax/LaTeX rendering */
-            .math, .MathJax { font-size: 1em; }
-
-            /* Highlight marker */
-            mark { background: rgba(255, 214, 165, 0.5); padding: 1px 4px; border-radius: 3px; }
-
-            /* Additional card template helpers */
-            .hidden { display: none !important; }
-            .center { text-align: center; }
-            .left { text-align: left; }
-            .right { text-align: right; }
-
-            /* Fix for iOS audio player not showing */
-            audio:not([src]) { display: none; }
-            audio[src=""] { display: none; }
-
-            /* Ensure all content is visible */
-            .card * { max-width: 100%; }
-
-            /* Anki's standard template classes */
-            #qa { font-size: 1.2em; line-height: 1.6; }
-            .qacontainer { width: 100%; }
-
-            /* Common Anki card template layout classes */
-            .extra, .info, .tags { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(128,128,128,0.2); }
-            .card .extra, .card .info { display: block; }
-            .deck, .subdeck { font-size: 0.9em; color: rgba(128,128,128,0.7); margin-bottom: 8px; }
-            .answer { font-weight: 600; }
-
-            /* Two-column layouts common in card templates */
-            .container, .row { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
-            .col, .col-left, .col-right { flex: 1 1 45%; min-width: 140px; }
-            .col-left { text-align: left; }
-            .col-right { text-align: right; }
-
-            /* Ensure floated elements don't get clipped */
-            .clearfix::after { content: ""; display: table; clear: both; }
-            .float-left { float: left; }
-            .float-right { float: right; }
-
-            /* Mobile-specific fixes */
-            @supports (-webkit-touch-callout: none) {
-                /* iOS specific */
-                audio { min-height: 44px; }
-            }
-
-            /* Prevent horizontal overflow */
-            .card { overflow-x: hidden; word-break: break-word; }
-            /* Full height coverage for card background */
-            html, body {
-                min-height: 100%;
-                height: 100%;
-            }
-            body {
-                display: flex;
-                flex-direction: column;
-                justify-content: center; /* Center content vertically */
-            }
-            .card {
-                flex: 1;
-                min-height: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: center; /* Center card content vertically */
-            }
-
-            /* Link styling for better visibility and touch */
-            a {
-                color: #007AFF;
-                text-decoration: underline;
-                text-underline-offset: 2px;
-                -webkit-tap-highlight-color: rgba(0, 122, 255, 0.3);
-            }
-            a:active {
-                opacity: 0.7;
-            }
-            a:visited {
-                color: #5856D6;
-            }
-
-            /* Ensure links have minimum touch target */
-            a, button, [role="button"] {
-                min-height: 44px;
-                min-width: 44px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            /* iOS specific link handling */
-            a[href^="http"], a[href^="https"] {
-                cursor: pointer;
-                pointer-events: auto;
             }
         </style>
         \(templateCSSInjection)
         </head>
         <body>
             <div class="card">\(bodyHTML)</div>
+            <script>
+            (function() {
+                // Replace <audio> elements with Anki-style play buttons
+                var playSVG = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                document.querySelectorAll('audio[src]').forEach(function(audio) {
+                    if (!audio.src || audio.src === '') return;
+                    var btn = document.createElement('button');
+                    btn.className = 'anki-play-btn';
+                    btn.innerHTML = playSVG;
+                    btn.setAttribute('data-src', audio.src);
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Use native bridge for playback
+                        window.webkit.messageHandlers.playAudio &&
+                            window.webkit.messageHandlers.playAudio.postMessage(this.getAttribute('data-src'));
+                    });
+                    audio.parentNode.insertBefore(btn, audio.nextSibling);
+                });
+            })();
+            </script>
         </body>
         \(autoplayScript)
         </html>
@@ -479,14 +431,7 @@ struct CardWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            // Ensure webview content fills the available space
-            let script = """
-                document.documentElement.style.minHeight = '100%';
-                document.body.style.minHeight = '100%';
-                document.body.style.display = 'flex';
-                document.body.style.flexDirection = 'column';
-            """
-            webView.evaluateJavaScript(script, completionHandler: nil)
+            // CSS already handles full-height layout
         }
 
         func playAudioSequence(_ filenames: [String]) {

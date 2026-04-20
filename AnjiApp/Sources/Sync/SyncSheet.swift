@@ -3,11 +3,14 @@ import AnkiKit
 import AnkiClients
 import AnkiSync
 import Dependencies
+import Sharing
 
 struct SyncSheet: View {
     @Binding var isPresented: Bool
     @Dependency(\.syncClient) var syncClient
     @Environment(\.anjiAccent) private var anjiAccent
+    @Shared(.lastSyncTime) private var lastSyncTime
+    @Shared(.lastSyncStatus) private var lastSyncStatus
     @State private var state: SyncState = .idle
     @State private var showLogin = false
     @State private var syncLogs: [String] = []
@@ -527,22 +530,23 @@ extension SyncSheet {
         guard KeychainHelper.loadHostKey() != nil else {
             showLogin = true; return
         }
-        
+
         syncLogs.removeAll()
         mediaProgress = .init()
+        lastSyncStatus = "inProgress"
 
         state = .syncing("Syncing collection...")
         addLog("Connecting to AnkiWeb...")
-        
+
         do {
             let summary = try await syncClient.sync()
-            addLog("Collection sync complete")
-            
+            addLog("Collection sync complete: \(summary.cardsPulled) pulled, \(summary.cardsPushed) pushed")
+
             state = .syncing("Syncing media...")
             isMediaSyncActive = true
             mediaProgress = AnkiKit.MediaSyncProgress(currentOperation: .checking)
             addLog("Starting media sync...")
-            
+
             do {
                 // Use the new progress-based API
                 let mediaSummary = try await syncClient.syncMediaWithProgress { progress in
@@ -564,7 +568,11 @@ extension SyncSheet {
                 // Don't fail entire sync if media fails
             }
             isMediaSyncActive = false
-            
+
+            // Record successful sync
+            lastSyncTime = ISO8601DateFormatter().string(from: Date())
+            lastSyncStatus = "success"
+
             state = .success(summary)
         } catch let e as SyncError where e == .authFailed {
             showLogin = true; state = .idle
@@ -572,6 +580,8 @@ extension SyncSheet {
             state = .needsFullSync
         } catch {
             addLog("Sync failed: \(error.localizedDescription)")
+            lastSyncTime = ISO8601DateFormatter().string(from: Date())
+            lastSyncStatus = "failed"
             state = .error(error.localizedDescription)
         }
     }

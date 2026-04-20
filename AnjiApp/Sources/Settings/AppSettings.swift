@@ -126,13 +126,34 @@ extension SharedReaderKey where Self == AppStorageKey<Bool>.Default {
     static var dailyQuoteEnabled: Self {
         Self[.appStorage("dailyQuoteEnabled"), default: true]
     }
-    
+
+    /// Enable background sync when app is not in foreground.
+    static var backgroundSyncEnabled: Self {
+        Self[.appStorage("backgroundSyncEnabled"), default: false]
+    }
 }
 
 extension SharedReaderKey where Self == AppStorageKey<String>.Default {
     /// Which stat cards to show on home page (stored as comma-separated list).
     static var homeStatCards: Self {
         Self[.appStorage("homeStatCards"), default: "today,cardCounts"]
+    }
+
+    /// Last sync timestamp (ISO8601 string or empty).
+    static var lastSyncTime: Self {
+        Self[.appStorage("lastSyncTime"), default: ""]
+    }
+
+    /// Last sync status: "success", "failed", "inProgress", or empty.
+    static var lastSyncStatus: Self {
+        Self[.appStorage("lastSyncStatus"), default: ""]
+    }
+}
+
+extension SharedReaderKey where Self == AppStorageKey<Int>.Default {
+    /// Sync interval in minutes: 0=manual, 15, 30, 60, 360=6h, 1440=daily.
+    static var syncIntervalMinutes: Self {
+        Self[.appStorage("syncIntervalMinutes"), default: 0]
     }
 }
 
