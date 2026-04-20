@@ -1,4 +1,4 @@
-import ActivityKit
+@preconcurrency import ActivityKit
 import SwiftUI
 import AnkiKit
 
@@ -26,7 +26,7 @@ struct AnjiStudyAttributes: ActivityAttributes {
 class LiveActivityManager: ObservableObject {
     static let shared = LiveActivityManager()
 
-    nonisolated(unsafe) private var currentActivity: Activity<AnjiStudyAttributes>?
+    private var currentActivity: Activity<AnjiStudyAttributes>?
 
     func startActivity(deckName: String, cardFront: String, counts: DeckCounts, totalReviewed: Int) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
@@ -69,18 +69,14 @@ class LiveActivityManager: ObservableObject {
             totalReviewed: totalReviewed
         )
 
-        Task {
-            await activity.update(using: newState)
-        }
+        Task { await activity.update(using: newState) }
     }
 
     func endActivity() {
         guard let activity = currentActivity else { return }
+        currentActivity = nil
 
-        Task {
-            await activity.end(dismissalPolicy: .immediate)
-            currentActivity = nil
-        }
+        Task { await activity.end(dismissalPolicy: .immediate) }
     }
 
     var isActive: Bool {
