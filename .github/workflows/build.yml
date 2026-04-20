@@ -9,8 +9,11 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
+      - name: Select Xcode 26
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app/Contents/Developer
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -29,18 +32,16 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            build/rust_build
+            anki-bridge-rs/target
           key: rust-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: rust-${{ runner.os }}-
 
-      - name: Cache Homebrew
+      - name: Cache XCFramework
         uses: actions/cache@v4
         with:
-          path: |
-            ~/Library/Caches/Homebrew
-            /opt/homebrew
-          key: brew-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
-          restore-keys: brew-${{ runner.os }}-
+          path: build/AnkiBackend.xcframework
+          key: xcfw-${{ runner.os }}-${{ hashFiles('anki-bridge-rs/Cargo.lock', 'scripts/build-xcframework.sh') }}
+          restore-keys: xcfw-${{ runner.os }}-
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -50,13 +51,13 @@ jobs:
       - name: Install dependencies
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew install protobuf swift-protobuf xcodegen 2>/dev/null || true
 
       - name: Build XCFramework
         run: |
-          # Cache XCFramework if already built
           if [ -f "build/AnkiBackend.xcframework/Info.plist" ]; then
-            echo "XCFramework found in cache, skipping build"
+            echo "✅ XCFramework cache hit, skipping build"
           else
             bash scripts/build-xcframework.sh
           fi
@@ -66,10 +67,18 @@ jobs:
           bash scripts/generate-protos.sh
           cd AnjiApp && xcodegen generate && cd ..
 
+      - name: Resolve Swift Packages
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project AnjiApp/AnjiApp.xcodeproj \
+            -scheme AnjiApp \
+            -clonedSourcePackagesDirPath build/spm_cache
+
       - name: Build Archive (optimized)
         run: |
           mkdir -p build
           echo "Starting xcodebuild archive..."
+          START=$(date +%s)
 
           xcodebuild archive \
             -project AnjiApp/AnjiApp.xcodeproj \
@@ -82,8 +91,8 @@ jobs:
             -skipPackagePluginValidation \
             -parallelizeTargets \
             COMPILER_INDEX_STORE_ENABLE=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=NO \
-            GCC_OPTIMIZATION_LEVEL=s \
             SWIFT_OPTIMIZATION_LEVEL=-O \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_STYLE=Manual \
@@ -92,7 +101,10 @@ jobs:
             ENABLE_BITCODE=NO \
             2>&1
 
-          if [ $? -ne 0 ]; then
+          RESULT=$?
+          echo "--- Archive took $(( $(date +%s) - START ))s ---"
+
+          if [ $RESULT -ne 0 ]; then
             echo "Build failed!"
             exit 1
           fi
