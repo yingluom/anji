@@ -48,6 +48,8 @@ final class ReviewSession {
     private(set) var isFinished = false
     private(set) var canUndo = false
     private(set) var nextIntervals: [Rating: String] = [:]
+    /// Last error encountered during session operations, exposed for UI diagnostics.
+    private(set) var lastError: String?
 
     /// Current card type: new (blue), learning (red), or review (green)
     var currentCardType: CardQueueType {
@@ -72,11 +74,14 @@ final class ReviewSession {
     func start() {
         do {
             try decks.setCurrentDeck(deckId)
-            reloadQueue()
-            advanceToNext()
         } catch {
+            lastError = "Failed to set current deck: \(error)"
             isFinished = true
+            return
         }
+
+        reloadQueue()
+        advanceToNext()
     }
 
     func revealAnswer() { showingAnswer = true }
@@ -99,6 +104,7 @@ final class ReviewSession {
             reloadQueue()
             advanceToNext()
         } catch {
+            lastError = "Answer failed: \(error)"
             if !cardQueue.isEmpty { cardQueue.removeFirst() }
             advanceToNext()
         }
@@ -139,13 +145,18 @@ final class ReviewSession {
     // MARK: Private
 
     private func reloadQueue() {
-        guard let result = try? scheduler.getQueuedCards(200) else { return }
-        cardQueue = result.cards
-        remainingCounts = DeckCounts(
-            newCount: result.newCount,
-            learnCount: result.learningCount,
-            reviewCount: result.reviewCount
-        )
+        do {
+            let result = try scheduler.getQueuedCards(200)
+            cardQueue = result.cards
+            remainingCounts = DeckCounts(
+                newCount: result.newCount,
+                learnCount: result.learningCount,
+                reviewCount: result.reviewCount
+            )
+        } catch {
+            lastError = "Failed to load cards: \(error)"
+            cardQueue = []
+        }
     }
 
     private func advanceToNext() {
@@ -159,12 +170,14 @@ final class ReviewSession {
         cardStartTime = .now
         nextIntervals = next.nextIntervals
 
-        if let rendered = try? rendering.renderCard(next.card.id) {
+        do {
+            let rendered = try rendering.renderCard(next.card.id)
             questionHTML = rendered.questionHTML
             answerHTML = rendered.answerHTML
             templateCSS = rendered.templateCSS
-        } else {
-            questionHTML = "<p style='color:red'>Failed to render card</p>"
+        } catch {
+            lastError = "Render failed: \(error)"
+            questionHTML = "<p style='color:red'>Failed to render card</p><p style='color:gray;font-size:12px'>Card ID: \(next.card.id)<br>Error: \(error)</p>"
             answerHTML = questionHTML
             templateCSS = ""
         }

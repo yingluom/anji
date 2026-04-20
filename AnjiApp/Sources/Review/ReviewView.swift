@@ -338,23 +338,41 @@ struct ReviewView: View {
     private var completionView: some View {
         VStack(spacing: Spacing.lg) {
             Spacer()
-            Image(systemName: "sparkles")
-                .font(.system(size: 56))
-                .foregroundStyle(anjiAccent.gradient)
-                .symbolEffect(.bounce, value: session.isFinished)
 
-            Text("review.well_done")
-                .anjiFont(.largeTitle)
-                .foregroundStyle(Color.anjiPrimary)
+            if let error = session.lastError, session.stats.reviewed == 0 {
+                // Show error state when session failed before any cards were reviewed
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(Color.anjiWarning)
 
-            VStack(spacing: Spacing.xs) {
-                Text("review.cards_completed(\(session.stats.reviewed))")
-                if session.stats.reviewed > 0 {
-                    Text("review.accuracy(\(Int(session.stats.accuracy * 100)))")
+                Text("review.session_error")
+                    .anjiFont(.title)
+                    .foregroundStyle(Color.anjiPrimary)
+
+                Text(error)
+                    .anjiFont(.callout)
+                    .foregroundStyle(Color.anjiSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            } else {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 56))
+                    .foregroundStyle(anjiAccent.gradient)
+                    .symbolEffect(.bounce, value: session.isFinished)
+
+                Text("review.well_done")
+                    .anjiFont(.largeTitle)
+                    .foregroundStyle(Color.anjiPrimary)
+
+                VStack(spacing: Spacing.xs) {
+                    Text("review.cards_completed(\(session.stats.reviewed))")
+                    if session.stats.reviewed > 0 {
+                        Text("review.accuracy(\(Int(session.stats.accuracy * 100)))")
+                    }
                 }
+                .anjiFont(.body)
+                .foregroundStyle(Color.anjiSecondary)
             }
-            .anjiFont(.body)
-            .foregroundStyle(Color.anjiSecondary)
 
             Spacer()
             Button("common.done") { onDismiss() }

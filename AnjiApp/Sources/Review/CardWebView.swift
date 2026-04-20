@@ -59,7 +59,12 @@ struct CardWebView: UIViewRepresentable {
             templateCSS: templateCSS,
             autoplayAudio: false
         )
-        webView.loadHTMLString(wrapper, baseURL: nil)
+        // Only reload if the HTML content actually changed to avoid flickering
+        // and interrupting in-progress loads.
+        if context.coordinator.lastLoadedHTML != wrapper {
+            context.coordinator.lastLoadedHTML = wrapper
+            webView.loadHTMLString(wrapper, baseURL: nil)
+        }
 
         // Use native player exclusively for reliable iOS audio playback
         if autoplayAudio {
@@ -418,6 +423,8 @@ struct CardWebView: UIViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         private var player: AVAudioPlayer?
         private var queue: [URL] = []
+        /// Tracks the last HTML loaded to avoid redundant reloads.
+        var lastLoadedHTML: String?
 
         override init() {
             super.init()

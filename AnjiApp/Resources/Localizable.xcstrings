@@ -512,6 +512,12 @@
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "显示答案" } }
       }
     },
+    "review.session_error": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Session Error" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "会话出错" } }
+      }
+    },
     "review.well_done": {
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "Well Done!" } },
