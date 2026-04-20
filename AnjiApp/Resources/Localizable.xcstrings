@@ -524,19 +524,19 @@
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "做得好！" } }
       }
     },
-    "review.cards_reviewed": {
+    "review.cards_reviewed(%lld)": {
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "%lld reviewed" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "已复习 %lld" } }
       }
     },
-    "review.cards_completed": {
+    "review.cards_completed(%lld)": {
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "%lld cards reviewed" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "已复习 %lld 张卡片" } }
       }
     },
-    "review.accuracy": {
+    "review.accuracy(%lld)": {
       "localizations": {
         "en": { "stringUnit": { "state": "translated", "value": "Accuracy: %lld%%" } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "正确率：%lld%%" } }
