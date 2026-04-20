@@ -26,7 +26,7 @@ struct AnjiStudyAttributes: ActivityAttributes {
 class LiveActivityManager: ObservableObject {
     static let shared = LiveActivityManager()
 
-    private var currentActivity: Activity<AnjiStudyAttributes>?
+    nonisolated(unsafe) private var currentActivity: Activity<AnjiStudyAttributes>?
 
     func startActivity(deckName: String, cardFront: String, counts: DeckCounts, totalReviewed: Int) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
